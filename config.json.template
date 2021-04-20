@@ -1,0 +1,11 @@
+{
+  
+  "secret": "aepMLQXFdGuh9NDknvHx76Wq8C3bzfZP",
+  
+  "server": {
+    "development": true,
+    "debug": true,
+    "host": "localhost",
+    "port": 5001
+  }
+}
