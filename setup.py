@@ -7,7 +7,6 @@ from os import path
 app = Flask(__name__)
 
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'log.conf')
-
 logging.config.fileConfig(log_file_path)
 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024

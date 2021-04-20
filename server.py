@@ -1,7 +1,7 @@
+from setup import app # Order matters, e.g. for logger!
 from configManager import ConfigManager
 from controllers.waypointController import waypoint_controller
 #from controllers.swaggerUIController import swaggerui_controller
-from setup import app
 import logging
 from werkzeug.exceptions import InternalServerError, NotFound
 from werkzeug.exceptions import HTTPException
