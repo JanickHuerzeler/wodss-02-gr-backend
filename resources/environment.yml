@@ -1,0 +1,16 @@
+name: WODSS-Backend
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - flask
+  - flask-swagger-ui
+  - requests
+  - autopep8
+  - ipykernel
+  - pandas
+  - nbconvert
+  - pytest
+  - pytest-mock
+  - coverage
