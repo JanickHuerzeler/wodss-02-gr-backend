@@ -16,3 +16,4 @@ dependencies:
   - coverage
   - setuptools
   - flasgger
+  - flask-cors

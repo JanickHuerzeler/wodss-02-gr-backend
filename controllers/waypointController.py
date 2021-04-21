@@ -3,7 +3,7 @@ from configManager import ConfigManager
 from werkzeug.exceptions import InternalServerError
 from setup import app
 import logging
-from flasgger import Schema, fields
+from flask_cors import cross_origin
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +14,7 @@ waypoint_controller = Blueprint(
 logger.info(f'I am in the waypointController!')
 
 @app.route('/helloworld/')
+@cross_origin()
 @waypoint_controller.route("/helloworld/", methods=['GET'])
 def helloworld():
     """
