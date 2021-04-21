@@ -1,6 +1,7 @@
 from setup import app # Order matters, e.g. for logger!
 from configManager import ConfigManager
 from controllers.waypointController import waypoint_controller
+from flasgger import Swagger
 #from controllers.swaggerUIController import swaggerui_controller
 import logging
 from werkzeug.exceptions import InternalServerError, NotFound
@@ -28,5 +29,6 @@ def handle_excpetion(e):
 
 if __name__ == '__main__':
     app.config['DEVELOPMENT'] = server_config["development"]
+    swagger = Swagger(app)
     app.run(debug=server_config["debug"],
             host=server_config["host"], port=server_config["port"])

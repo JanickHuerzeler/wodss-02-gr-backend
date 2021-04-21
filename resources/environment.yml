@@ -14,3 +14,5 @@ dependencies:
   - pytest
   - pytest-mock
   - coverage
+  - setuptools
+  - flasgger
