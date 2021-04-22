@@ -8,10 +8,12 @@ import os
 class ConfigManager:
     __instance = None
 
-    __configFilePath = None    
+    __configFilePath = None
     __secret = None
-    __server_config = None    
+    __server_config = None
     __application_root = None
+    __cantonservice_urls = None
+    __geoservice_url = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -26,23 +28,24 @@ class ConfigManager:
         if ConfigManager.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
-            ConfigManager.__instance = self            
+            ConfigManager.__instance = self
         self.logger = logging.getLogger('pywall.' + __name__)
 
         self.load_config(config_path_string)
 
     def load_config(self, config_path_string):
-        self.__configFilePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_path_string)        
+        self.__configFilePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_path_string)
 
         with open(self.__configFilePath, 'r') as json_data:
-            config = json.load(json_data)            
+            config = json.load(json_data)
             self.__secret = config['secret']
-            self.__server_config = config['server']            
+            self.__server_config = config['server']
             self.__application_root = config['application_root']
-
+            self.__cantonservice_urls = config['cantonservice_urls']
+            self.__geoservice_url = config['geoservice_url']
 
     def log_configfile_path(self):
-        self.logger.info("ConfigFile-Path is: " + str(self.__configFilePath))    
+        self.logger.info("ConfigFile-Path is: " + str(self.__configFilePath))
 
     def get_secret(self):
         return self.__secret
@@ -52,3 +55,9 @@ class ConfigManager:
 
     def get_application_root(self):
         return self.__application_root
+
+    def get_cantonservice_urls(self):
+        return self.__cantonservice_urls
+
+    def get_geoservice_url(self):
+        return self.__geoservice_url

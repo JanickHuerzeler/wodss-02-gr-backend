@@ -8,4 +8,113 @@
     "host": "localhost",
     "port": 5001
   }
+
+  "cantonservice_urls": {
+    "AG": {
+      "url": "https://covid-navigator.ch/api",
+      "ssl_ca_cert": ""
+    },
+    "AR": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "AI": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "BL": {
+      "url": "https://86.119.34.31",
+      "ssl_ca_cert": "BL.pem"
+    },
+    "BS": {
+      "url": "https://86.119.34.31",
+      "ssl_ca_cert": "BS.pem"
+    },
+    "BE": {
+      "url": "https://bern.coronanavigator.ch",
+      "ssl_ca_cert": ""
+    },
+    "FR": {
+      "url": "https://service-devl.wodss12.cf",
+      "ssl_ca_cert": ""
+    },
+    "GE": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "GL": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "GR": {
+      "url": "https://gr.corona-navigator.ch/v1",
+      "ssl_ca_cert": ""
+    },
+    "JU": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "LU": {
+      "url": "https://86.119.34.70",
+      "ssl_ca_cert": "LU.pem"
+    },
+    "NE": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "NW": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "OW": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "SH": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "SZ": {
+      "url": "https://86.119.43.84/api",
+      "ssl_ca_cert": "SZ.pem"
+    },
+    "SO": {
+      "url": "https://conav.dvob.ch/api/v1",
+      "ssl_ca_cert": ""
+    },
+    "SG": {
+      "url": "https://86.119.43.232:8888",
+      "ssl_ca_cert": "SG.pem"
+    },
+    "TI": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "TG": {
+      "url": "https://thurgau.entry-check.ch/api/v1",
+      "ssl_ca_cert": ""
+    },
+    "UR": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "VD": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "VS": {
+      "url": "",
+      "ssl_ca_cert": ""
+    },
+    "ZG": {
+      "url": "http://86.119.34.76/kantonsservice-zug",
+      "ssl_ca_cert": ""
+    },
+    "ZH": {
+      "url": "https://jagd.ddns.net/api",
+      "ssl_ca_cert": ""
+    }
+  },
+
+  "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/"
 }

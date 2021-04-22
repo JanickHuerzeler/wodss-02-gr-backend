@@ -16,6 +16,6 @@ def create_app():
 
 
 def get_test_app():
-    global db, app
+    global app
         
     return app

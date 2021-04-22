@@ -17,3 +17,7 @@ dependencies:
   - setuptools
   - flasgger
   - flask-cors
+  - certifi
+  - six
+  - setuptools
+  - urllib3
