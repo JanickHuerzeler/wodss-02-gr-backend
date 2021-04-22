@@ -43,7 +43,7 @@ class MunicipalitiesApi(object):
 
         :param async_req bool
         :param int bfs_nr: bfsNr (required)
-        :return: list[Municipality]
+        :return: Municipality
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -64,7 +64,7 @@ class MunicipalitiesApi(object):
 
         :param async_req bool
         :param int bfs_nr: bfsNr (required)
-        :return: list[Municipality]
+        :return: Municipality
                  If the method is called asynchronously,
                  returns the request thread.
         """
