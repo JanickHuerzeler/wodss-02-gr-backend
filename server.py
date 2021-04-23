@@ -1,6 +1,9 @@
-from setup import app # Order matters, e.g. for logger!
+from setup import app  # Order matters, e.g. for logger!
 from configManager import ConfigManager
 from controllers.waypointController import waypoint_controller
+from controllers.incidenceController import incidence_controller
+from controllers.municipalityController import municipality_controller
+
 from flasgger import Swagger
 from swagger_metadata import template
 from flask_cors import CORS, cross_origin
@@ -15,8 +18,9 @@ server_config = ConfigManager.get_instance().get_server_config()
 application_root = ConfigManager.get_instance().get_application_root()
 
 app.register_blueprint(waypoint_controller, url_prefix=application_root)
+app.register_blueprint(incidence_controller, url_prefix=application_root)
+app.register_blueprint(municipality_controller, url_prefix=application_root)
 #app.register_blueprint(swaggerui_controller, url_prefix=application_root)
-
 
 
 @app.errorhandler(Exception)
@@ -32,10 +36,10 @@ def handle_excpetion(e):
 
 if __name__ == '__main__':
     app.config['DEVELOPMENT'] = server_config["development"]
-    
+
     swagger = Swagger(app, template=template)
     cors = CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
-    
+
     app.run(debug=server_config["debug"],
             host=server_config["host"], port=server_config["port"])

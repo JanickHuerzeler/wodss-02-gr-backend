@@ -226,6 +226,7 @@ class Municipality(object):
 
         return self.to_dict() != other.to_dict()
 
+    # TODO: we should not modify this generated model
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""

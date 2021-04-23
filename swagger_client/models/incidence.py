@@ -173,3 +173,16 @@ class Incidence(object):
             return True
 
         return self.to_dict() != other.to_dict()
+
+    # TODO: we should not modify this generated model
+    @property
+    def serialize(self):
+        """Return object data in easily serializeable format"""
+        from configManager import ConfigManager
+        df = ConfigManager.get_instance().get_required_date_format()
+
+        return {
+            'bfsNr': self._bfs_nr,
+            'date': self.__date.strftime(df),
+            'incidence': self._incidence
+        }
