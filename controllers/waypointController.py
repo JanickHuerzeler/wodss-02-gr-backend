@@ -5,7 +5,7 @@ from werkzeug.exceptions import InternalServerError
 from setup import app
 import logging
 from flask_cors import cross_origin
-from services.canton import CantonService
+from services.waypoint import WayPointService
 from services.ErrorHandlerService import ErrorHandlerService
 
 
@@ -59,3 +59,12 @@ def helloworld():
     logger.info(f'GET /helloworld/ was called.')
 
     return jsonify([{'polygon': [[[6.12354, 45.58797], [6.52425, 45.5874524597], [6.5345, 45.4524], [6.12000, 45.04520]]], 'municipality': {'bfs_nr': 1234, 'incidence': 123.12, 'population': 10_000, 'area': 120.75}}])
+
+
+@app.route('/geo/<lat>/<lng>/<distance>/')
+@cross_origin()
+@waypoint_controller.route("/geo/<lat>/<lng>/<distance>/", methods=['GET'])
+def get_geodata(lat, lng, distance):
+    # TODO: Input param checks
+    result = WayPointService.get_waypoint_data(lat, lng, distance)
+    return jsonify(result)
