@@ -9,6 +9,8 @@
     "port": 5001
   },
 
+  "requiredDateFormat": "%Y-%m-%d",
+
   "cantonservice_urls": {
     "AG": {
       "url": "https://covid-navigator.ch/api",

@@ -11,6 +11,7 @@ class ConfigManager:
     __configFilePath = None
     __secret = None
     __server_config = None
+    __required_date_format = None
     __application_root = None
     __cantonservice_urls = None
     __geoservice_url = None
@@ -40,6 +41,7 @@ class ConfigManager:
             config = json.load(json_data)
             self.__secret = config['secret']
             self.__server_config = config['server']
+            self.__required_date_format = str(config['requiredDateFormat'])
             self.__application_root = config['application_root']
             self.__cantonservice_urls = config['cantonservice_urls']
             self.__geoservice_url = config['geoservice_url']
@@ -52,6 +54,9 @@ class ConfigManager:
 
     def get_server_config(self):
         return self.__server_config
+
+    def get_required_date_format(self):
+        return self.__required_date_format
 
     def get_application_root(self):
         return self.__application_root
