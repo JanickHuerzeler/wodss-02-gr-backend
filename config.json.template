@@ -118,5 +118,7 @@
     }
   },
 
-  "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/"
+  "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/",
+  "incidence_retry_days": 3,
+  "nth_waypoint_filter": 30
 }

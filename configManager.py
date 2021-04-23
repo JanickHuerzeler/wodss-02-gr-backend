@@ -15,6 +15,9 @@ class ConfigManager:
     __application_root = None
     __cantonservice_urls = None
     __geoservice_url = None
+    __geoservice_search_radius = None
+    __incidence_retry_days = None
+    __nth_waypoint_filter = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,6 +48,9 @@ class ConfigManager:
             self.__application_root = config['application_root']
             self.__cantonservice_urls = config['cantonservice_urls']
             self.__geoservice_url = config['geoservice_url']
+            self.__geoservice_search_radius = config['geoservice_search_radius']
+            self.__incidence_retry_days = config['incidence_retry_days']
+            self.__nth_waypoint_filter = config['nth_waypoint_filter']
 
     def log_configfile_path(self):
         self.logger.info("ConfigFile-Path is: " + str(self.__configFilePath))
@@ -66,3 +72,12 @@ class ConfigManager:
 
     def get_geoservice_url(self):
         return self.__geoservice_url
+
+    def get_geoservice_search_radius(self):
+        return self.__geoservice_search_radius
+
+    def get_incidence_retry_days(self):
+        return self.__incidence_retry_days
+
+    def get_nth_waypoint_filter(self):
+        return self.__nth_waypoint_filter

@@ -7,12 +7,16 @@ import logging
 from flask_cors import cross_origin
 from services.waypoint import WayPointService
 from services.ErrorHandlerService import ErrorHandlerService
-
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as pyplot
 
 logger = logging.getLogger(__name__)
 waypoint_controller = Blueprint(
     'waypoint_controller', __name__, template_folder='templates')
 df = ConfigManager.get_instance().get_required_date_format()
+search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
+nth_waypoint_filter: int = ConfigManager.get_instance().get_nth_waypoint_filter()
 
 
 @app.route('/helloworld/')
@@ -31,10 +35,10 @@ def helloworld():
                 municipality:
                     type: object
                     properties:
-                        area: 
+                        area:
                             type: number
                         bfs_nr:
-            __getClientConfig     type: integer
+                            type: integer
                         incidence:
                             type: integer
                         population:
@@ -68,3 +72,128 @@ def get_geodata(lat, lng, distance):
     # TODO: Input param checks
     result = WayPointService.get_waypoint_data(lat, lng, distance)
     return jsonify(result)
+
+
+@app.route('/waypoints/')
+@cross_origin()
+@waypoint_controller.route('/waypoints/', methods=['POST'])
+def post_waypoints():
+    """
+    Gets Municipalities and their corona- and geo-information where the given waypoints lay in.
+    ---
+    description: Municipalities with corona and geo-information
+    definitions:
+        municipalityDTO:
+            type: object
+            properties:
+                bfs_nr:
+                    type: integer
+                canton:
+                    type: string
+                name:
+                    type: string
+                plz:
+                    type: integer
+                incidence:
+                    type: number
+                incidence_date:
+                    type: string
+                    format: date
+                incidence_color:
+                    type: string
+                geo_shape:
+                    type: array
+                    items:
+                        $ref: '#/definitions/coordinateDTO'
+        coordinateDTO:            
+            type: object
+            properties:
+                lat:
+                    type: number
+                lng:
+                    type: number
+    produces:
+        - application/json
+    consumes:
+        - application/json
+    parameters:
+        - in: body
+          name: waypoints
+          description: Array of waypoints from route
+          schema:
+            type: array
+            items:
+                $ref: '#/definitions/coordinateDTO'
+    responses:
+        200:
+            description: Array of with unique MunicipalityDTOs that could be matched with the provided waypoint coordinates
+            schema:
+                type: array
+                items:
+                    $ref: '#/definitions/municipalityDTO'
+        204:
+            description: Empty array was passed
+        400:
+            description: Invalid format of the body or could not even parse it (needs application/json as Content-Type, hence body must be valid JSON too)
+    """
+
+# Probably OpenAPI 3.0 spec, maybe useful if we should change to some proper swagger documentaion
+#  requestBody:
+#         descriptions: Array of waypoints from route
+#         required: true
+#         content:
+#             application/json:
+#                 schema:
+#                     type: array
+#                     items:
+#                         $ref: '#/definitions/coordinateDTO'
+
+    try:
+        waypoints = request.json # forces use of 'application/json' content type!
+    except Excpetion:
+        return 'Could not parse body as JSON.', 400
+
+    logger.info(f'Got {len(waypoints)} waypoints.')
+
+    # TODO: Validate waypoints (not just simply the first as here)
+    if len(waypoints) == 0:
+        return 'Please provide some waypoints.', 204
+    elif waypoints[0] is None:
+        return 'Invalid waypoint.', 400
+    elif 'lat' not in waypoints[0].keys():
+        return 'Waypoint must include "lat" key.', 400
+    elif 'lng' not in waypoints[0].keys():
+        return 'Waypoint must include "lng" key.', 400     
+
+    logger.info(f'Waypoints passed some easy validation. (only looked at first waypoint)')
+
+    # Take only every n-th waypoint
+    waypoints = waypoints[::nth_waypoint_filter]
+
+    logger.info(f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
+
+    result_list = [WayPointService.get_waypoint_data(waypoint['lat'], waypoint['lng'], search_radius) for waypoint in waypoints]
+    
+    result = list({v['bfs_nr']:v for v in result_list if v}.values())
+
+    logger.info(f'Found {len(result)} unique municipalities based on the waypoints.')
+
+    # TODO: Make sure this dataframe magic is properly used and configured
+    df_result = pd.DataFrame(result)    
+
+    print(df_result)
+
+    # Color maps from: https://matplotlib.org/stable/tutorials/colors/colormaps.html#sequential
+    color_map = pyplot.cm.get_cmap('YlOrRd')
+
+    # Normalize values from 0 to 750 into 0 to 1
+    norm = matplotlib.colors.Normalize(vmin=0, vmax=750)        
+
+    # Make gray when incidence it 0 or below or any other thing (should mark that it's missing)
+    df_result['incidence_color'] = df_result['incidence'].apply(lambda incidence: matplotlib.colors.rgb2hex(color_map(norm(incidence))) if incidence > 0 else '#70706e')
+
+    print (df_result.columns)
+    print (df_result.head())
+
+    result_lst = df_result.to_dict('records')
+    return jsonify(result_lst)

@@ -21,3 +21,4 @@ dependencies:
   - six
   - setuptools
   - urllib3
+  - matplotlib
