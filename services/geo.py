@@ -27,8 +27,15 @@ class GeoService:
             result['canton'] = response_data['fields']['kanton']
             result['plz'] = response_data['fields']['postleitzahl']
             result['name'] = response_data['fields']['ortbez27']
-            result['geo_shape'] = list(map(GeoService.__format_geoshape,
-                                       response_data['fields']['geo_shape']['coordinates'][0]))
+            geo_shape_type = response_data['fields']['geo_shape']['type']
+            if geo_shape_type == 'Polygon':
+                result['geo_shapes'] = [list(map(GeoService.__format_geoshape,
+                                       response_data['fields']['geo_shape']['coordinates'][0]))]
+            elif geo_shape_type == 'MultiPolygon':
+                result['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0])) for polygon in response_data['fields']['geo_shape']['coordinates']]
+            else:
+                logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
+                result['geo_shapes'] = []
 
             return result
         except requests.exceptions.HTTPError as errh:
@@ -36,15 +43,15 @@ class GeoService:
             raise SystemExit(errh)
         except requests.exceptions.ConnectionError as errc:
             print("Error Connecting:", errc)
-            raise SystemExit(errh)
+            raise SystemExit(errc)
         except requests.exceptions.Timeout as errt:
             print("Timeout Error:", errt)
-            raise SystemExit(errh)
+            raise SystemExit(errt)
         except requests.exceptions.RequestException as err:
             print("Oops: Something Else", err)
-            raise SystemExit(errh)
-        except:
-            print("exception")
+            raise SystemExit(err)
+        except Exception as ex:
+            print("exception", ex)
             return None
 
     @staticmethod
