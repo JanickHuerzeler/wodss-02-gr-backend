@@ -31,8 +31,17 @@ class GeoService:
                 municipality['canton'] = entry['fields']['kanton']
                 municipality['plz'] = entry['fields']['postleitzahl']
                 municipality['name'] = entry['fields']['ortbez27']
-                municipality['geo_shape'] = list(
-                    map(GeoService.__format_geoshape, entry['fields']['geo_shape']['coordinates'][0]))
+
+                geo_shape_type = entry['fields']['geo_shape']['type']
+                if geo_shape_type == 'Polygon':
+                    municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape,
+                                                           entry['fields']['geo_shape']['coordinates'][0]))]
+                elif geo_shape_type == 'MultiPolygon':
+                    municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
+                                                  for polygon in entry['fields']['geo_shape']['coordinates']]
+                else:
+                    logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
+                    municipality['geo_shapes'] = []
 
                 logger.info(
                     f"Found bfs_nr={municipality['bfs_nr']}, plz={municipality['plz']}, name={municipality['name']}")
@@ -40,20 +49,21 @@ class GeoService:
                 result.append(municipality)
 
             return result
+
         except requests.exceptions.HTTPError as errh:
             print("Http Error:", errh)
             raise SystemExit(errh)
         except requests.exceptions.ConnectionError as errc:
             print("Error Connecting:", errc)
-            raise SystemExit(errh)
+            raise SystemExit(errc)
         except requests.exceptions.Timeout as errt:
             print("Timeout Error:", errt)
-            raise SystemExit(errh)
+            raise SystemExit(errt)
         except requests.exceptions.RequestException as err:
             print("Oops: Something Else", err)
-            raise SystemExit(errh)
-        except:
-            print("exception")
+            raise SystemExit(err)
+        except Exception as ex:
+            print("exception", ex)
             return None
 
     @staticmethod

@@ -103,17 +103,19 @@ def post_waypoints():
                     format: date
                 incidence_color:
                     type: string
-                geo_shape:
+                geo_shapes:
                     type: array
                     items:
-                        $ref: '#/definitions/coordinateDTO'
-        coordinateDTO:
+                        type: array
+                        items:
+                            $ref: '#/definitions/coordinateDTO'
+        coordinateDTO:            
             type: object
             properties:
                 lat:
                     type: number
                 lng:
-                    type: number
+                    type: number      
     produces:
         - application/json
     consumes:
