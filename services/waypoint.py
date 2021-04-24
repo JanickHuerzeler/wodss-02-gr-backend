@@ -8,6 +8,7 @@ import pandas as pd
 import json
 import matplotlib
 import matplotlib.pyplot as pyplot
+from shapely.geometry import shape, GeometryCollection, Point
 
 
 logger = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ df = ConfigManager.get_instance().get_required_date_format()
 incidence_retry_days: int = ConfigManager.get_instance().get_incidence_retry_days()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
 nth_waypoint_filter: int = ConfigManager.get_instance().get_nth_waypoint_filter()
+use_local_geo_data: bool = ConfigManager.get_instance().get_use_local_geo_data()
 
 
 class WayPointService:
@@ -22,16 +24,22 @@ class WayPointService:
     @staticmethod
     def get_waypoints_data(waypoints) -> dict:
 
-        # Loop all given waypoints and find municipalities for them
-        # One Waypoint can return multiple municipalities due to search_radius
         municipalities_geo_data = []
-        for waypoint in waypoints:
-            result = GeoService.get_geodata(waypoint['lat'], waypoint['lng'], search_radius)
-            if result:
-                municipalities_geo_data.extend(result)
+
+        if use_local_geo_data:
+            logger.info('Use local geo data to retreive municipalities for coordinates')
+            municipalities_geo_data = GeoService.get_local_geodata(waypoints)
+        else:
+            # Loop all given waypoints and find municipalities for them
+            # One Waypoint can return multiple municipalities due to search_radius
+            logger.info('Use webservice geo data to retreive municipalities for coordinates')
+            for waypoint in waypoints:
+                result = GeoService.get_geodata(waypoint['lat'], waypoint['lng'], search_radius)
+                if result:
+                    municipalities_geo_data.extend(result)
 
         df_municipalities_geo_data = pd.DataFrame.from_dict(municipalities_geo_data)
-        df_municipalities_geo_data.drop_duplicates(subset=['plz'], inplace=True)
+        df_municipalities_geo_data.drop_duplicates(subset=['name'], inplace=True)
 
         unique_municipalities = df_municipalities_geo_data.drop_duplicates(subset=['bfs_nr']).to_dict('records')
 
@@ -59,13 +67,14 @@ class WayPointService:
                 if incidence_data:
                     df_incidence_data = pd.DataFrame.from_dict(incidence_data)
                     df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
+
                 else:
-                    df_municipalities_incidence_data = pd.DataFrame(columns={'bfsNr', 'date', 'incidence'})
+                    df_incidence_data = pd.DataFrame(columns={'bfsNr', 'date', 'incidence'})
+                    df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
+
                     logger.warn(
                         f'No incidence found after some retrys. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
 
-            print('df_municipalities_incidence_data: ')
-            print(df_municipalities_incidence_data)
         else:
             # TODO: How do we handle waypoints we did not find a municipality for?
             logger.warn(f'GeoService could not return any data for a given waypoints.')

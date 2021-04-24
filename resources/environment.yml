@@ -22,3 +22,5 @@ dependencies:
   - setuptools
   - urllib3
   - matplotlib
+  - shapely
+  - rtree

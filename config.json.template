@@ -1,13 +1,13 @@
 {
-  
   "secret": "aepMLQXFdGuh9NDknvHx76Wq8C3bzfZP",
-  
+  "application_root": "/",
+
   "server": {
     "development": true,
     "debug": true,
     "host": "localhost",
     "port": 5001
-  }
+  },
 
   "requiredDateFormat": "%Y-%m-%d",
 
@@ -119,6 +119,8 @@
   },
 
   "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/",
+  "geoservice_search_radius": 1000,
   "incidence_retry_days": 3,
-  "nth_waypoint_filter": 30
+  "nth_waypoint_filter": 1,
+  "use_local_geo_data": true
 }

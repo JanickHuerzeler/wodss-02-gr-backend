@@ -11,6 +11,9 @@ class CantonService:
 
     @staticmethod
     def get_municipalities(canton):
+        if not CantonService.__isCantonAvailable(canton):
+            return []
+
         try:
             logger.info(f'CantonService.get_municipalities(canton) with canton={canton}')
             client = swagger_client.MunicipalitiesApi(
@@ -26,6 +29,9 @@ class CantonService:
 
     @staticmethod
     def get_municipality(canton, bfs_nr):
+        if not CantonService.__isCantonAvailable(canton):
+            return []
+
         try:
             logger.info(f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
             client = swagger_client.MunicipalitiesApi(
@@ -39,6 +45,9 @@ class CantonService:
 
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        if not CantonService.__isCantonAvailable(canton):
+            return []
+
         try:
             logger.info(
                 f'CantonService.get_incidences(canton, dateFrom, dateTo, bfs_nr=None) with canton={canton}, dateFrom={dateFrom}, dateTo={dateTo}, bfs_nr={bfs_nr}')
@@ -66,8 +75,7 @@ class CantonService:
         # TODO: Perhaps not the best way
         client_config.verify_ssl = False
 
-        # TODO: Handle canton not available
-        if canton in canton_api_urls and canton_api_urls[canton]['url'] != "":
+        if CantonService.__isCantonAvailable(canton):
             client_config.host = canton_api_urls[canton]['url']
             if canton_api_urls[canton]['ssl_ca_cert'] != "":
                 client_config.ssl_ca_cert = f'certificates/{canton_api_urls[canton]["ssl_ca_cert"]}'
@@ -75,3 +83,12 @@ class CantonService:
                 client_config.ssl_ca_cert = None
 
         return client_config
+
+    @staticmethod
+    def __isCantonAvailable(canton):
+        canton_api_urls = ConfigManager.get_instance().get_cantonservice_urls()
+        if canton in canton_api_urls and canton_api_urls[canton]['url'] != "":
+            return True
+        else:
+            logger.warn(f'Canton not available: {canton}')
+            return False

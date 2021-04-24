@@ -1,8 +1,22 @@
+from rtree import index
+import json
+from shapely.geometry import shape, GeometryCollection, Point
 import requests
 from configManager import ConfigManager
 import logging
 
 logger = logging.getLogger(__name__)
+
+use_local_geo_data = ConfigManager.get_instance().get_use_local_geo_data()
+if use_local_geo_data:
+    with open("plz_verzeichnis_v2.geojson") as f:
+        features = json.load(f)["features"]
+
+    # Create the R-tree index and store the features in it (bounding box)
+    polygonIndex = index.Index()
+    for pos, feature in enumerate(features):
+        if feature['geometry']:
+            polygonIndex.insert(pos, shape(feature['geometry']).bounds)
 
 
 class GeoService:
@@ -43,9 +57,6 @@ class GeoService:
                     logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
                     municipality['geo_shapes'] = []
 
-                logger.info(
-                    f"Found bfs_nr={municipality['bfs_nr']}, plz={municipality['plz']}, name={municipality['name']}")
-
                 result.append(municipality)
 
             return result
@@ -65,6 +76,48 @@ class GeoService:
         except Exception as ex:
             print("exception", ex)
             return None
+
+    @staticmethod
+    def get_local_geodata(waypoints):
+
+        if not use_local_geo_data:
+            raise Exception('Local geo data usage is not configured in config.json - data not initialized!')
+
+        municipalities_geo_data = []
+
+        # Create shapely Points
+        points = []
+        for waypoint in waypoints:
+            points.append(Point(waypoint['lng'], waypoint['lat']))
+
+        # iterate through points
+        for i, pt in enumerate(points):
+            point = shape(pt)
+            # iterate through spatial index
+            for j in polygonIndex.intersection(point.coords[0]):
+                if point.within(shape(features[j]['geometry'])):
+                    entry = features[j]
+
+                    municipality = {}
+                    municipality['bfs_nr'] = entry['properties']['bfsnr']
+                    municipality['canton'] = entry['properties']['kanton']
+                    municipality['plz'] = entry['properties']['gplz']
+                    municipality['name'] = entry['properties']['ortbez27']
+
+                    geo_shape_type = entry['geometry']['type']
+                    if geo_shape_type == 'Polygon':
+                        municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape,
+                                                               entry['geometry']['coordinates'][0]))]
+                    elif geo_shape_type == 'MultiPolygon':
+                        municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
+                                                      for polygon in entry['geometry']['coordinates']]
+                    else:
+                        logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
+                        municipality['geo_shapes'] = []
+
+                    municipalities_geo_data.append(municipality)
+
+        return municipalities_geo_data
 
     @staticmethod
     def __format_geoshape(coord):
