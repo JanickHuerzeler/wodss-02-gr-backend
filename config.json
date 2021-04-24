@@ -119,7 +119,7 @@
   },
 
   "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/",
-  "geoservice_search_radius": 100,
+  "geoservice_search_radius": 1000,
   "incidence_retry_days": 3,
-  "nth_waypoint_filter": 30
+  "nth_waypoint_filter": 50
 }

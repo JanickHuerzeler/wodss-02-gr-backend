@@ -14,21 +14,30 @@ class GeoService:
             ('geofilter.distance', f'{lat},{lng},{distance}')
         )
 
+        logger.info(
+            f'GeoService.get_geodata(lat, lng, distance) with lat={lat}, lng={lng}, distance={distance}')
+
         geoservice_url = ConfigManager.get_instance().get_geoservice_url()
 
         try:
             # TODO: Handle request errors
             response = requests.get(geoservice_url, params=params)
-            response_data = response.json()['records'][0]
+            response_data = response.json()['records']
 
-            # TODO: Handle multiple municipality result for given coordinates
-            result = {}
-            result['bfs_nr'] = response_data['fields']['bfsnr']
-            result['canton'] = response_data['fields']['kanton']
-            result['plz'] = response_data['fields']['postleitzahl']
-            result['name'] = response_data['fields']['ortbez27']
-            result['geo_shape'] = list(map(GeoService.__format_geoshape,
-                                       response_data['fields']['geo_shape']['coordinates'][0]))
+            result = []
+            for entry in response_data:
+                municipality = {}
+                municipality['bfs_nr'] = entry['fields']['bfsnr']
+                municipality['canton'] = entry['fields']['kanton']
+                municipality['plz'] = entry['fields']['postleitzahl']
+                municipality['name'] = entry['fields']['ortbez27']
+                municipality['geo_shape'] = list(
+                    map(GeoService.__format_geoshape, entry['fields']['geo_shape']['coordinates'][0]))
+
+                logger.info(
+                    f"Found bfs_nr={municipality['bfs_nr']}, plz={municipality['plz']}, name={municipality['name']}")
+
+                result.append(municipality)
 
             return result
         except requests.exceptions.HTTPError as errh:

@@ -6,6 +6,8 @@ from setup import app
 import logging
 from flask_cors import cross_origin
 from services.waypoint import WayPointService
+from services.geo import GeoService
+from services.canton import CantonService
 from services.ErrorHandlerService import ErrorHandlerService
 import pandas as pd
 import matplotlib
@@ -105,7 +107,7 @@ def post_waypoints():
                     type: array
                     items:
                         $ref: '#/definitions/coordinateDTO'
-        coordinateDTO:            
+        coordinateDTO:
             type: object
             properties:
                 lat:
@@ -149,7 +151,7 @@ def post_waypoints():
 #                         $ref: '#/definitions/coordinateDTO'
 
     try:
-        waypoints = request.json # forces use of 'application/json' content type!
+        waypoints = request.json  # forces use of 'application/json' content type!
     except Excpetion:
         return 'Could not parse body as JSON.', 400
 
@@ -163,37 +165,16 @@ def post_waypoints():
     elif 'lat' not in waypoints[0].keys():
         return 'Waypoint must include "lat" key.', 400
     elif 'lng' not in waypoints[0].keys():
-        return 'Waypoint must include "lng" key.', 400     
+        return 'Waypoint must include "lng" key.', 400
 
     logger.info(f'Waypoints passed some easy validation. (only looked at first waypoint)')
 
     # Take only every n-th waypoint
     waypoints = waypoints[::nth_waypoint_filter]
 
-    logger.info(f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
+    logger.info(
+        f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
 
-    result_list = [WayPointService.get_waypoint_data(waypoint['lat'], waypoint['lng'], search_radius) for waypoint in waypoints]
-    
-    result = list({v['bfs_nr']:v for v in result_list if v}.values())
+    result = WayPointService.get_waypoints_data(waypoints)
 
-    logger.info(f'Found {len(result)} unique municipalities based on the waypoints.')
-
-    # TODO: Make sure this dataframe magic is properly used and configured
-    df_result = pd.DataFrame(result)    
-
-    print(df_result)
-
-    # Color maps from: https://matplotlib.org/stable/tutorials/colors/colormaps.html#sequential
-    color_map = pyplot.cm.get_cmap('YlOrRd')
-
-    # Normalize values from 0 to 750 into 0 to 1
-    norm = matplotlib.colors.Normalize(vmin=0, vmax=750)        
-
-    # Make gray when incidence it 0 or below or any other thing (should mark that it's missing)
-    df_result['incidence_color'] = df_result['incidence'].apply(lambda incidence: matplotlib.colors.rgb2hex(color_map(norm(incidence))) if incidence > 0 else '#70706e')
-
-    print (df_result.columns)
-    print (df_result.head())
-
-    result_lst = df_result.to_dict('records')
-    return jsonify(result_lst)
+    return jsonify(result)
