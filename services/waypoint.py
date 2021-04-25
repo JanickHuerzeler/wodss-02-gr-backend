@@ -84,8 +84,6 @@ class WayPointService:
             df_municipalities_incidence_data, left_on='bfs_nr', right_on='bfsNr', how='left')
         result.drop(columns={'bfsNr'}, inplace=True)
         result.rename(columns={'date': 'incidence_date'}, inplace=True)
-        # TODO: Is this correct to fill NA with 0? What is our indicator if no data was found?
-        result.fillna(0, inplace=True)
 
         # Color maps from: https://matplotlib.org/stable/tutorials/colors/colormaps.html#sequential
         color_map = pyplot.cm.get_cmap('RdYlGn_r')
@@ -95,7 +93,10 @@ class WayPointService:
 
         # Make gray when incidence it 0 or below or any other thing (should mark that it's missing)
         result['incidence_color'] = result['incidence'].apply(
-            lambda incidence: matplotlib.colors.rgb2hex(color_map(norm(incidence))) if incidence > 0 else '#70706e')
+            lambda incidence: matplotlib.colors.rgb2hex(color_map(norm(incidence))))
+
+        # Replace NaN values with None to ensure jsonify sets it to null
+        result = result.where(pd.notnull(result), None)
 
         print('return:')
         print(result)
