@@ -25,7 +25,8 @@ class CantonService:
 
             return result
         except ApiException as e:
-            print("Exception when calling MunicipalitiesApi->municipalities_get: %s\n" % e)
+            logger.error("Exception when calling MunicipalitiesApi->municipalities_get: %s\n" % e)
+            return []
 
     @staticmethod
     def get_municipality(canton, bfs_nr):
@@ -41,7 +42,8 @@ class CantonService:
             return municipality.serialize
 
         except ApiException as e:
-            print("Exception when calling MunicipalitiesApi->municipalities_bfs_nr_get: %s\n" % e)
+            logger.error("Exception when calling MunicipalitiesApi->municipalities_bfs_nr_get: %s\n" % e)
+            return []
 
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
@@ -65,18 +67,20 @@ class CantonService:
 
             return result
         except ApiException as e:
-            print("Exception when calling IncidencesApi->incidences_get: %s\n" % e)
+            logger.error("Exception when calling IncidencesApi->incidences_get: %s\n" % e)
+            return []
 
     @staticmethod
     def __getClientConfig(canton):
         client_config = swagger_client.Configuration()
         canton_api_urls = ConfigManager.get_instance().get_cantonservice_urls()
 
-        # TODO: Perhaps not the best way
-        client_config.verify_ssl = False
-
         if CantonService.__isCantonAvailable(canton):
             client_config.host = canton_api_urls[canton]['url']
+            if canton_api_urls[canton]['url'].startswith("https"):
+                client_config.verify_ssl = True
+                client_config.assert_hostname = False
+
             if canton_api_urls[canton]['ssl_ca_cert'] != "":
                 client_config.ssl_ca_cert = f'certificates/{canton_api_urls[canton]["ssl_ca_cert"]}'
             else:
