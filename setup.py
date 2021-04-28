@@ -7,7 +7,7 @@ import requests_cache
 
 app = Flask(__name__)
 
-#requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4) # 4h
+requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4) # 4h
 
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'log.conf')
 logging.config.fileConfig(log_file_path)

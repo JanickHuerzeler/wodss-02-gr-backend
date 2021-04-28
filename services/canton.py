@@ -103,9 +103,13 @@ class CantonService:
         logger.debug(f'Going to call url: {url}')
 
         if ssl_cert_path != '':            
-            return requests.get(url, verify=ssl_cert_path, params=query_params)
+            response = requests.get(url, verify=ssl_cert_path, params=query_params)
         else:
-            return requests.get(url, params=query_params)
+            response = requests.get(url, params=query_params)
+
+        logger.debug(f'Got response from CantonService {canton}. (url: {url}, from_cache: {response.from_cache}, with ssl verify: {(ssl_cert_path != "")})')
+
+        return response
 
     @staticmethod
     def __getRequestInfo(canton: str):
