@@ -1,17 +1,18 @@
 from configManager import ConfigManager
 
+
 class Incidence(object):
 
     def __init__(self, bfsNr=None, date=None, incidence=None, *args, **kwargs):
-   
+
         self._bfs_nr = None
-        self.__date = None
-        self._incidence = None        
+        self._date = None
+        self._incidence = None
 
         if bfsNr is not None:
             self.bfs_nr = bfsNr
         if date is not None:
-            self.__date = date
+            self.date = date
         if incidence is not None:
             self.incidence = incidence
 
@@ -37,25 +38,25 @@ class Incidence(object):
         self._bfs_nr = bfs_nr
 
     @property
-    def _date(self):
-        """Gets the _date of this Incidence.
+    def date(self):
+        """Gets the date of this Incidence.
 
 
-        :return: The _date of this Incidence.
+        :return: The date of this Incidence.
         :rtype: date
         """
-        return self.__date
+        return self._date
 
-    @_date.setter
-    def _date(self, _date):
-        """Sets the _date of this Incidence.
+    @date.setter
+    def date(self, date):
+        """Sets the date of this Incidence.
 
 
-        :param _date: The _date of this Incidence.
+        :param date: The date of this Incidence.
         :type: date
         """
 
-        self.__date = _date
+        self._date = date
 
     @property
     def incidence(self):
@@ -78,12 +79,11 @@ class Incidence(object):
 
         self._incidence = incidence
 
-    
     @property
     def as_dict(self):
-        """Return object data as dictionary in easily serializeable format"""                
+        """Return object data as dictionary in easily serializeable format"""
         return {
             'bfsNr': self._bfs_nr,
-            'date': self.__date, # already comes as string, not format neccessary
+            'date': self._date,  # already comes as string, not format neccessary
             'incidence': self._incidence
         }

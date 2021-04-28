@@ -1,13 +1,12 @@
-class Municipality(object):    
+class Municipality(object):
 
-    def __init__(self, bfsNr=None, name=None, canton=None, area=None, population=None, *args, **kwargs):        
-        
+    def __init__(self, bfsNr=None, name=None, canton=None, area=None, population=None, *args, **kwargs):
 
         self._bfs_nr = None
         self._name = None
         self._canton = None
         self._area = None
-        self._population = None        
+        self._population = None
 
         if bfsNr is not None:
             self.bfs_nr = bfsNr
@@ -19,7 +18,6 @@ class Municipality(object):
             self.area = area
         if population is not None:
             self.population = population
-
 
     @property
     def bfs_nr(self):
