@@ -25,7 +25,7 @@ class CantonService:
 
             return result
         except ApiException as e:
-            logger.error("Exception when calling MunicipalitiesApi->municipalities_get: %s\n" % e)
+            logger.warn(f'Exception when calling IncidencesApi->incidences_get: {e.status} - {e.reason}')
             return []
 
     @staticmethod
@@ -42,7 +42,7 @@ class CantonService:
             return municipality.serialize
 
         except ApiException as e:
-            logger.error("Exception when calling MunicipalitiesApi->municipalities_bfs_nr_get: %s\n" % e)
+            logger.warn(f'Exception when calling IncidencesApi->incidences_get: {e.status} - {e.reason}')
             return []
 
     @staticmethod
@@ -59,7 +59,6 @@ class CantonService:
             if bfs_nr is None:
                 incidences = client.incidences_get(date_from=dateFrom, date_to=dateTo)
             else:
-                # TODO: Handle 404 municipality not found
                 incidences = client.incidences_bfs_nr_get(bfs_nr, date_from=dateFrom, date_to=dateTo)
             result = []
             for i in incidences:
@@ -67,7 +66,7 @@ class CantonService:
 
             return result
         except ApiException as e:
-            logger.error("Exception when calling IncidencesApi->incidences_get: %s\n" % e)
+            logger.warn(f'Exception when calling IncidencesApi->incidences_get: {e.status} - {e.reason}')
             return []
 
     @staticmethod
