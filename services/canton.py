@@ -28,13 +28,14 @@ class CantonService:
                 result.append(Municipality(**m).as_dict)
 
             return result
-        except requests.exceptions.RequestException as e:
-            print("Exception when calling CantonService.__getMunicipalities or processing its response: %s\n" % e)
+        except requests.exceptions.RequestException as e:            
+            logger.exception("Exception when calling CantonService.__getMunicipalities or processing its response.")
+            return []
 
     @staticmethod
     def get_municipality(canton, bfs_nr):
         if not CantonService.__isCantonAvailable(canton):
-            return []
+            return {}
 
         try:
             logger.info(f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
@@ -42,9 +43,9 @@ class CantonService:
             municipality = CantonService.__getMunicipalities(canton, bfs_nr)            
             # TODO: Handle 404 municipality not found
             return Municipality(**municipality).as_dict
-
         except requests.exceptions.RequestException as e:
-            print("Exception when calling CantonService.__getMunicipalities or processing its response: %s\n" % e)            
+            logger.exception("Exception when calling CantonService.__getMunicipalities or processing its response.")
+            return {}
 
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
@@ -69,7 +70,8 @@ class CantonService:
 
             return result
         except requests.exceptions.RequestException as e:
-            print("Exception when calling CantonService.__getIncidences or processing its response: %s\n" % e)            
+            logger.exception("Exception when calling CantonService.__getIncidences or processing its response")
+            return []
 
     @staticmethod
     def __getIncidences(canton: str, dateFrom, dateTo, bfs_nr=None):
@@ -98,7 +100,6 @@ class CantonService:
             return requests.get(url, verify=ssl_cert_path, params=query_params)
         else:
             return requests.get(url, params=query_params)
-
 
     @staticmethod
     def __getRequestInfo(canton: str):

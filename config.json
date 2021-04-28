@@ -14,7 +14,7 @@
   "cantonservice_urls": {
     "AG": {
       "url": "https://covid-navigator.ch/api",
-      "ssl_ca_cert": ""
+      "ssl_ca_cert": "AG.pem"
     },
     "AR": {
       "url": "",
