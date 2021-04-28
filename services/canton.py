@@ -28,8 +28,10 @@ class CantonService:
                 result.append(Municipality(**m).as_dict)
 
             return result
+        except requests.exceptions.HTTPError as errh:
+            logger.warn(f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}')
         except requests.exceptions.RequestException as e:            
-            logger.exception("Exception when calling CantonService.__getMunicipalities or processing its response.")
+            logger.exception('Exception when calling CantonService.__getMunicipalities or processing its response.')
             return []
 
     @staticmethod
@@ -43,6 +45,8 @@ class CantonService:
             municipality = CantonService.__getMunicipalities(canton, bfs_nr)            
             # TODO: Handle 404 municipality not found
             return Municipality(**municipality).as_dict
+        except requests.exceptions.HTTPError as errh:
+            logger.warn(f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}')
         except requests.exceptions.RequestException as e:
             logger.exception("Exception when calling CantonService.__getMunicipalities or processing its response.")
             return {}
@@ -69,6 +73,8 @@ class CantonService:
                 result.append(Incidence(**i).as_dict)
 
             return result
+        except requests.exceptions.HTTPError as errh:
+            logger.warn(f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}')
         except requests.exceptions.RequestException as e:
             logger.exception("Exception when calling CantonService.__getIncidences or processing its response")
             return []

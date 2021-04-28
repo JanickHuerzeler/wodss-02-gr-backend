@@ -98,7 +98,6 @@ class WayPointService:
         # Replace NaN values with None to ensure jsonify sets it to null
         result = result.where(pd.notnull(result), None)
 
-        print('return:')
         print(result)
 
         return result.to_dict('records')

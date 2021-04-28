@@ -171,6 +171,7 @@ def post_waypoints():
 
     logger.info(f'Waypoints passed some easy validation. (only looked at first waypoint)')
 
+    # TODO: Should we still have this option? Currently we are always process all waypoints
     # Take only every n-th waypoint
     waypoints = waypoints[::nth_waypoint_filter]
 
@@ -178,5 +179,8 @@ def post_waypoints():
         f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
 
     result = WayPointService.get_waypoints_data(waypoints)
+
+    logger.info(
+        f'Found {len(result)} unique municipalities for {len(waypoints)} waypoints')
 
     return jsonify(result)
