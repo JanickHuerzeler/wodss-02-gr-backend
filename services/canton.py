@@ -48,7 +48,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             logger.warn(f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}')
         except requests.exceptions.RequestException as e:
-            logger.exception("Exception when calling CantonService.__getMunicipalities or processing its response.")
+            logger.exception('Exception when calling CantonService.__getMunicipalities or processing its response.')
             return {}
 
     @staticmethod
@@ -76,7 +76,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             logger.warn(f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}')
         except requests.exceptions.RequestException as e:
-            logger.exception("Exception when calling CantonService.__getIncidences or processing its response")
+            logger.exception('Exception when calling CantonService.__getIncidences or processing its response')
             return []
 
     @staticmethod
@@ -116,14 +116,14 @@ class CantonService:
         if CantonService.__isCantonAvailable(canton):
             host = CantonService.canton_api_urls[canton]['url']
             canton_ssl_cert_name = CantonService.canton_api_urls[canton]['ssl_ca_cert']
-            if canton_ssl_cert_name != "":
+            if canton_ssl_cert_name != '':
                 canton_ssl_cert_path = f'certificates/{canton_ssl_cert_name}'        
 
         return host, canton_ssl_cert_path
 
     @staticmethod
     def __isCantonAvailable(canton: str):        
-        if canton in CantonService.canton_api_urls and CantonService.canton_api_urls[canton]['url'] != "":
+        if canton in CantonService.canton_api_urls and CantonService.canton_api_urls[canton]['url'] != '':
             return True
         else:
             logger.warn(f'Canton not available: {canton}')
