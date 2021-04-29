@@ -6,6 +6,10 @@
 # SQLLite cache DB
 *_cache.sqlite
 
+# REDIS cache data
+redis-data
+
+
 ### Logging ###
 # Backup files with timestamp
 *.log.[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]

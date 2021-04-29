@@ -9,6 +9,12 @@
     "port": 5001
   },
 
+  "redis_server": {
+    "host": "localhost",
+    "port": 6379,
+    "password": "redis"
+  },
+
   "requiredDateFormat": "%Y-%m-%d",
 
   "cantonservice_urls": {
