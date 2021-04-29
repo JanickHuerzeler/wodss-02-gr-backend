@@ -27,7 +27,7 @@ def get_incidences_for_canton(canton):
           name: canton
           type: string
           required: true
-          description: canton
+          description: two-char canton abbreviation
         - in: query
           name: dateFrom
           type: string
@@ -40,7 +40,7 @@ def get_incidences_for_canton(canton):
           description: dateTo - dateTo is inclusive. If not given, all datasets till today.
     responses:
         200:
-            description: Array of with incidenceDTO
+            description: Array of incidenceDTO
             schema:
                 type: array
                 items:
@@ -55,6 +55,9 @@ def get_incidences_for_canton(canton):
         0).strftime(df)
     date_to = request.args['dateTo'] if 'dateTo' in request.args else datetime.today(
     ).strftime(df)
+
+    logger.info(
+        f'GET /cantons/<canton>/incidences/ was called. (canton: {canton}, date_from: {date_from}, date_to: {date_to})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
@@ -91,7 +94,7 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
           name: canton
           type: string
           required: true
-          description: canton
+          description: two-char canton abbreviation
         - in: path
           name: bfsNr
           type: string
@@ -109,7 +112,7 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
           description: dateTo - dateTo is inclusive. If not given, all datasets till today.
     responses:
         200:
-            description: Array of with incidenceDTO
+            description: Array of incidenceDTO
             schema:
                 type: array
                 items:
@@ -124,6 +127,9 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         0).strftime(df)
     date_to = request.args['dateTo'] if 'dateTo' in request.args else datetime.today(
     ).strftime(df)
+
+    logger.info(
+        f'GET /cantons/<canton>/municipalities/<bfsNr>/incidences/ was called. (canton: {canton}, bfsNr: {bfsNr}, date_from: {date_from}, date_to: {date_to})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):

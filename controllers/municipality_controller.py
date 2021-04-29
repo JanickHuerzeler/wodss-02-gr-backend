@@ -27,10 +27,10 @@ def get_municipalities_for_canton(canton):
           name: canton
           type: string
           required: true
-          description: canton
+          description: two-char canton abbreviation
     responses:
         200:
-            description: Array of with municipalityMetadataDTO
+            description: Array of municipalityMetadataDTO
             schema:
                 type: array
                 items:
@@ -40,6 +40,9 @@ def get_municipalities_for_canton(canton):
         404:
             description: Canton not found
     """
+
+    logger.info(
+        f'GET /cantons/<canton>/municipalities/ was called. (canton: {canton})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
@@ -73,7 +76,7 @@ def get_municipalitiy_for_canton(canton, bfsNr):
           name: bfsNr
           type: string
           required: true
-          description: canton
+          description: two-char canton abbreviation
     responses:
         200:
             description: municipalityMetadataDTO
@@ -84,6 +87,9 @@ def get_municipalitiy_for_canton(canton, bfsNr):
         404:
             description: Canton or municipality not found
     """
+
+    logger.info(
+        f'GET /cantons/<canton>/municipalities/<bfsNr>/ was called. (canton: {canton}, bfsNr: {bfsNr})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
