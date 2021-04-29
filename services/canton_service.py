@@ -17,11 +17,13 @@ class CantonService:
             return []
 
         try:
-            logger.info(f'CantonService.get_municipalities(canton) with canton={canton}')
+            logger.info(
+                f'CantonService.get_municipalities(canton) with canton={canton}')
 
             municipalities = CantonService.__getMunicipalities(canton, None)
 
-            logger.debug(f'Got {len(municipalities)} municipalities from CantonService {canton}.')
+            logger.debug(
+                f'Got {len(municipalities)} municipalities from CantonService {canton}.')
 
             result = []
             for m in municipalities:
@@ -29,11 +31,15 @@ class CantonService:
 
             return result
         except requests.exceptions.HTTPError as errh:
-            logger.warn(
-                f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}')
+            log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
+            if errh.response.status_code < 500:
+                logger.warn(log_msg)
+            else:
+                logger.exception(log_msg)
             return []
         except requests.exceptions.RequestException as e:
-            logger.exception('Exception when calling CantonService.__getMunicipalities or processing its response.')
+            logger.exception(
+                'Exception when calling CantonService.__getMunicipalities or processing its response.')
             return []
 
     @staticmethod
@@ -42,16 +48,21 @@ class CantonService:
             return {}
 
         try:
-            logger.info(f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
+            logger.info(
+                f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
 
             municipality = CantonService.__getMunicipalities(canton, bfs_nr)
             return Municipality(**municipality).as_dict
         except requests.exceptions.HTTPError as errh:
-            logger.warn(
-                f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}')
+            log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
+            if errh.response.status_code < 500:
+                logger.warn(log_msg)
+            else:
+                logger.exception(log_msg)
             return {}
         except requests.exceptions.RequestException as e:
-            logger.exception('Exception when calling CantonService.__getMunicipalities or processing its response.')
+            logger.exception(
+                'Exception when calling CantonService.__getMunicipalities or processing its response.')
             return {}
 
     @staticmethod
@@ -64,11 +75,14 @@ class CantonService:
                 f'CantonService.get_incidences(canton, dateFrom, dateTo, bfs_nr=None) with canton={canton}, dateFrom={dateFrom}, dateTo={dateTo}, bfs_nr={bfs_nr}')
 
             if bfs_nr is None:
-                incidences = CantonService.__getIncidences(canton, dateFrom, dateTo)
+                incidences = CantonService.__getIncidences(
+                    canton, dateFrom, dateTo)
             else:
-                incidences = CantonService.__getIncidences(canton, dateFrom, dateTo, bfs_nr)
+                incidences = CantonService.__getIncidences(
+                    canton, dateFrom, dateTo, bfs_nr)
 
-            logger.debug(f'Got {len(incidences)} incidences from CantonService {canton}.')
+            logger.debug(
+                f'Got {len(incidences)} incidences from CantonService {canton}.')
 
             result = []
             for i in incidences:
@@ -76,11 +90,15 @@ class CantonService:
 
             return result
         except requests.exceptions.HTTPError as errh:
-            logger.warn(
-                f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}')
+            log_msg = f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}'
+            if errh.response.status_code < 500:
+                logger.warn(log_msg)
+            else:
+                logger.exception(log_msg)
             return None
         except requests.exceptions.RequestException as e:
-            logger.exception('Exception when calling CantonService.__getIncidences or processing its response')
+            logger.exception(
+                'Exception when calling CantonService.__getIncidences or processing its response')
             return None
 
     @staticmethod
@@ -88,7 +106,8 @@ class CantonService:
         resource_path = '/incidences/'
         query_params = {'dateFrom': dateFrom, 'dateTo': dateTo}
 
-        response = CantonService.__getResponse(canton, resource_path, bfs_nr, query_params)
+        response = CantonService.__getResponse(
+            canton, resource_path, bfs_nr, query_params)
         return response.json()
 
     @staticmethod
@@ -102,12 +121,14 @@ class CantonService:
     def __getResponse(canton: str, resource_path: str, path_param: str = None, query_params: dict = None):
         host, ssl_cert_path = CantonService.__getRequestInfo(canton)
 
-        url = f'{host}{resource_path}' + (f'{path_param}/' if path_param is not None else '')
+        url = f'{host}{resource_path}' + \
+            (f'{path_param}/' if path_param is not None else '')
 
         logger.debug(f'Going to call url: {url}')
 
         if ssl_cert_path != '':
-            response = requests.get(url, verify=ssl_cert_path, params=query_params)
+            response = requests.get(
+                url, verify=ssl_cert_path, params=query_params)
         else:
             response = requests.get(url, params=query_params)
 
