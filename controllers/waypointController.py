@@ -2,7 +2,7 @@ from flask import jsonify, request, Blueprint
 from datetime import datetime
 from configManager import ConfigManager
 from werkzeug.exceptions import InternalServerError
-from setup import app
+from app import app
 import logging
 from flask_cors import cross_origin
 from services.waypoint import WayPointService

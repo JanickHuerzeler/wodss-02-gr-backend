@@ -19,7 +19,6 @@ dependencies:
   - flask-cors
   - certifi
   - six
-  - setuptools
   - urllib3
   - matplotlib
   - shapely

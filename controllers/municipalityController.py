@@ -2,7 +2,7 @@ from flask import jsonify, request, Blueprint
 from datetime import datetime
 from configManager import ConfigManager
 from werkzeug.exceptions import InternalServerError
-from setup import app
+from app import app
 import logging
 from services.canton import CantonService
 from services.ErrorHandlerService import ErrorHandlerService

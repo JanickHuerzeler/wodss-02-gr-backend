@@ -1,4 +1,4 @@
-from setup import app  # Order matters, e.g. for logger!
+from app import app  # Order matters, e.g. for logger!
 from configManager import ConfigManager
 from controllers.waypointController import waypoint_controller
 from controllers.incidenceController import incidence_controller

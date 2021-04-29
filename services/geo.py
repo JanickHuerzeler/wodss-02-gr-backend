@@ -4,19 +4,17 @@ from shapely.geometry import shape, GeometryCollection, Point
 import requests
 from configManager import ConfigManager
 import logging
+from app import geo_features
 
 logger = logging.getLogger(__name__)
 
 use_local_geo_data = ConfigManager.get_instance().get_use_local_geo_data()
 if use_local_geo_data:
-    with open("plz_verzeichnis_v2.geojson") as f:
-        features = json.load(f)["features"]
-
     # Create the R-tree index and store the features in it (bounding box)
     polygonIndex = index.Index()
-    for pos, feature in enumerate(features):
-        if feature['geometry']:
-            polygonIndex.insert(pos, shape(feature['geometry']).bounds)
+    for pos, geo_feature in enumerate(geo_features):
+        if geo_feature['geometry']:
+            polygonIndex.insert(pos, shape(geo_feature['geometry']).bounds)
 
 
 class GeoService:
@@ -95,8 +93,8 @@ class GeoService:
             point = shape(pt)
             # iterate through spatial index
             for j in polygonIndex.intersection(point.coords[0]):
-                if point.within(shape(features[j]['geometry'])):
-                    entry = features[j]
+                if point.within(shape(geo_features[j]['geometry'])):
+                    entry = geo_features[j]
 
                     municipality = {}
                     municipality['bfs_nr'] = entry['properties']['bfsnr']

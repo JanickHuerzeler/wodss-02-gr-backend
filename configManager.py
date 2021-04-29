@@ -16,6 +16,7 @@ class ConfigManager:
     __cantonservice_urls = None
     __geoservice_url = None
     __geoservice_search_radius = None
+    __geolocal_filepath = None
     __incidence_retry_days = None
     __nth_waypoint_filter = None
     __use_local_geo_data = None
@@ -50,6 +51,7 @@ class ConfigManager:
             self.__cantonservice_urls = config['cantonservice_urls']
             self.__geoservice_url = config['geoservice_url']
             self.__geoservice_search_radius = config['geoservice_search_radius']
+            self.__geolocal_filepath = config['geolocal_filepath']
             self.__incidence_retry_days = config['incidence_retry_days']
             self.__nth_waypoint_filter = config['nth_waypoint_filter']
             self.__use_local_geo_data = config['use_local_geo_data']
@@ -77,6 +79,9 @@ class ConfigManager:
 
     def get_geoservice_search_radius(self):
         return self.__geoservice_search_radius
+
+    def get_geolocal_filepath(self):
+        return self.__geolocal_filepath
 
     def get_incidence_retry_days(self):
         return self.__incidence_retry_days

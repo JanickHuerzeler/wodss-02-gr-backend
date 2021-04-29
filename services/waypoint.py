@@ -47,14 +47,14 @@ class WayPointService:
             df_municipalities_incidence_data = pd.DataFrame()
             # For every found municipality, try to fetch corona data
             for municipality in unique_municipalities:
-                # TODO: Error handling for incidence data fetching
                 incidence_data = CantonService.get_incidences(municipality['canton'], datetime.now().strftime(
                     df), datetime.now().strftime(df), municipality['bfs_nr'])
 
                 retry_count = 0
 
                 # If there was no data for 'today' go back one or two days and try to load those
-                while retry_count < 3 and not incidence_data:
+                # If incidence_data was None, the canton is not available, do not retry
+                while retry_count < 3 and incidence_data is not None:
                     retry_count += 1
                     logger.debug(
                         f'Retrying to get incidence. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
@@ -73,12 +73,11 @@ class WayPointService:
                     df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
 
                     logger.warn(
-                        f'No incidence found after some retrys. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
+                        f'No incidence found. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
 
         else:
-            # TODO: How do we handle waypoints we did not find a municipality for?
             logger.warn(f'GeoService could not return any data for a given waypoints.')
-            return None
+            return []
 
         result = df_municipalities_geo_data.merge(
             df_municipalities_incidence_data, left_on='bfs_nr', right_on='bfsNr', how='left')
