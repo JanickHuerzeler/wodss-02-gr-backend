@@ -1,5 +1,6 @@
 from datetime import datetime
 from configManager import ConfigManager
+import re
 
 
 class ErrorHandlerService:
@@ -7,6 +8,11 @@ class ErrorHandlerService:
     @staticmethod
     def check_bfs_nr_format(bfs_nr):
         return bfs_nr.isdecimal() and len(bfs_nr) <= 4
+
+    # check if canton contains only two chars
+    @staticmethod
+    def check_canton_format(canton):
+        return True if re.fullmatch(r'[a-zA-Z]{2}', canton) else False
 
     # check if date is in the correct format (yyyy-MM-dd)
     @staticmethod
