@@ -5,10 +5,10 @@ from werkzeug.exceptions import InternalServerError
 from app import app
 import logging
 from flask_cors import cross_origin
-from services.waypoint import WayPointService
-from services.geo import GeoService
-from services.canton import CantonService
-from services.ErrorHandlerService import ErrorHandlerService
+from services.waypoint_service import WaypointService
+from services.geo_service import GeoService
+from services.canton_service import CantonService
+from services.errorhandler_service import ErrorHandlerService
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as pyplot
@@ -81,7 +81,7 @@ def post_waypoints():
     logger.info(
         f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
 
-    result = WayPointService.get_waypoints_data(waypoints)
+    result = WaypointService.get_waypoints_data(waypoints)
 
     logger.info(
         f'Found {len(result)} unique municipalities for {len(waypoints)} waypoints')

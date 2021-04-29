@@ -2,8 +2,8 @@ import requests
 from datetime import datetime, timedelta
 from configManager import ConfigManager
 import logging
-from services.geo import GeoService
-from services.canton import CantonService
+from services.geo_service import GeoService
+from services.canton_service import CantonService
 import pandas as pd
 import json
 import matplotlib
@@ -19,7 +19,7 @@ nth_waypoint_filter: int = ConfigManager.get_instance().get_nth_waypoint_filter(
 use_local_geo_data: bool = ConfigManager.get_instance().get_use_local_geo_data()
 
 
-class WayPointService:
+class WaypointService:
 
     @staticmethod
     def get_waypoints_data(waypoints) -> dict:

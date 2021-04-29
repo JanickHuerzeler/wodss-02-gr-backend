@@ -1,16 +1,16 @@
-from app import app  # Order matters, e.g. for logger!
+from app import app
 from configManager import ConfigManager
-from controllers.waypointController import waypoint_controller
-from controllers.incidenceController import incidence_controller
-from controllers.municipalityController import municipality_controller
+
+from controllers.waypoint_controller import waypoint_controller
+from controllers.incidence_controller import incidence_controller
+from controllers.municipality_controller import municipality_controller
 
 from flasgger import Swagger
 from swagger_metadata import template
 from flask_cors import CORS, cross_origin
-#from controllers.swaggerUIController import swaggerui_controller
+
 import logging
 from werkzeug.exceptions import InternalServerError, NotFound
-from werkzeug.exceptions import HTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ application_root = ConfigManager.get_instance().get_application_root()
 app.register_blueprint(waypoint_controller, url_prefix=application_root)
 app.register_blueprint(incidence_controller, url_prefix=application_root)
 app.register_blueprint(municipality_controller, url_prefix=application_root)
-#app.register_blueprint(swaggerui_controller, url_prefix=application_root)
 
 
 @app.errorhandler(Exception)

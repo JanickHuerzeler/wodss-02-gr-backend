@@ -4,8 +4,8 @@ from configManager import ConfigManager
 from werkzeug.exceptions import InternalServerError
 from app import app
 import logging
-from services.canton import CantonService
-from services.ErrorHandlerService import ErrorHandlerService
+from services.canton_service import CantonService
+from services.errorhandler_service import ErrorHandlerService
 
 logger = logging.getLogger(__name__)
 

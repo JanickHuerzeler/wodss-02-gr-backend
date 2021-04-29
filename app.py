@@ -14,7 +14,6 @@ logging.config.fileConfig(log_file_path)
 
 logger = logging.getLogger(__name__)
 
-
 # Setup request_cache with sqlite backend
 requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4)  # 4h
 
@@ -27,13 +26,3 @@ if use_local_geo_data:
         geo_features = json.load(f)["features"]
 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
-
-
-def create_app():
-    return app
-
-
-def get_test_app():
-    global app
-
-    return app
