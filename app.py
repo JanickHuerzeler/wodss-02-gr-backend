@@ -5,6 +5,7 @@ from configManager import ConfigManager
 from os import path
 import requests_cache
 import json
+import redis
 
 app = Flask(__name__)
 
@@ -15,8 +16,22 @@ logging.config.fileConfig(log_file_path)
 logger = logging.getLogger(__name__)
 
 
+redis_server = ConfigManager.get_instance().get_redis_server_config()
+secret_key = ConfigManager.get_instance().get_secret()
+
+redis_conn = redis.Redis(
+    host=redis_server['host'],
+    port=redis_server['port'],
+    password=redis_server['password']
+)
+
+# Setup request_cache with redis backend
+requests_cache.install_cache(cache_name='cantonservice_cache', backend='redis',
+                             connection=redis_conn, secret_key=secret_key, expire_after=3600*4)  # 4h
+
 # Setup request_cache with sqlite backend
-requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4)  # 4h
+# requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4)  # 4h
+
 
 # Read local geojson data
 use_local_geo_data = ConfigManager.get_instance().get_use_local_geo_data()

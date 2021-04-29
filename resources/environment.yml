@@ -24,3 +24,4 @@ dependencies:
   - shapely
   - rtree
   - requests-cache
+  - redis-py

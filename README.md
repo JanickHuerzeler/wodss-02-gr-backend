@@ -22,12 +22,11 @@ Das soeben erstellte Conda Environment muss dabei noch aktiviert werden:
 conda activate WODSS-Backend
 ```
 
-
 ---
 
 ## Installieren von neuen Libraries
 
-*Immer in der aktivierten Conda-Umgebung*
+_Immer in der aktivierten Conda-Umgebung_
 
 Wird eine Library neu installiert (`conda install XYZ`), muss diese im `resources/environment.yml` nachgeführt werden.
 Dies kann manuell geschehen, am einfachsten durch Kopieren der Ausgabe von folgendem Befehl:
@@ -43,3 +42,15 @@ conda env update --file resources/environment.yml
 ```
 
 `--prune` würde zusätzlich noch nicht mehr verwendete Libraries gleich entfernen.
+
+## Redis
+
+Für das Caching von Inzidenzzahlen wird Redis verwendet. Der Redis-Server steht im `docker-compose.yml` als Docker Image bereit.
+
+### Prerequisites
+
+Docker Deamon muss installiert sein und laufen.
+
+```zsh / CMD
+docker-compose up -d
+```
