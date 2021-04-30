@@ -6,8 +6,13 @@ from os import path
 import requests_cache
 import json
 import redis
+from flasgger import Swagger
+from swagger_metadata import template
 
 app = Flask(__name__)
+
+# Setup swagger
+swagger = Swagger(app, template=template)
 
 # Setup logging
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'log.conf')

@@ -1,3 +1,4 @@
+import redis
 from app import app
 from configManager import ConfigManager
 
@@ -5,8 +6,6 @@ from controllers.waypoint_controller import waypoint_controller
 from controllers.incidence_controller import incidence_controller
 from controllers.municipality_controller import municipality_controller
 
-from flasgger import Swagger
-from swagger_metadata import template
 from flask_cors import CORS, cross_origin
 
 import logging
@@ -28,6 +27,9 @@ def handle_excpetion(e):
         # Not found exception also contains automatic calls from browsers, e.g. to /favicon.ico
         logger.debug('A NotFound exception occurred.', exc_info=e)
         return e
+    elif isinstance(e, redis.exceptions.ConnectionError):
+        logger.critical(f'Could not connect to redis server. Make sure it is started!',exc_info=e)
+        return InternalServerError(description='An instance of this application seems to be not running. Please contact the administrator of this app.')
     else:
         logger.critical('Unhandled Exception occurred', exc_info=e)
         return InternalServerError(description='An InternalServerError occurred. Please contact the administrator of this app.', original_exception=e)
@@ -35,8 +37,7 @@ def handle_excpetion(e):
 
 if __name__ == '__main__':
     app.config['DEVELOPMENT'] = server_config["development"]
-
-    swagger = Swagger(app, template=template)
+    
     cors = CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
 
