@@ -31,8 +31,7 @@ class GeoService:
 
         geoservice_url = ConfigManager.get_instance().get_geoservice_url()
 
-        try:
-            # TODO: Handle request errors
+        try:            
             response = requests.get(geoservice_url, params=params)
             response_data = response.json()['records']
 
@@ -52,7 +51,7 @@ class GeoService:
                     municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
                                                   for polygon in entry['fields']['geo_shape']['coordinates']]
                 else:
-                    logger.warnig(f'Unknown geo_shape type {geo_shape_type}!')
+                    logger.warning(f'Unknown geo_shape type {geo_shape_type}!')
                     municipality['geo_shapes'] = []
 
                 result.append(municipality)
@@ -60,19 +59,12 @@ class GeoService:
             return result
 
         except requests.exceptions.HTTPError as errh:
-            print("Http Error:", errh)
-            raise SystemExit(errh)
-        except requests.exceptions.ConnectionError as errc:
-            print("Error Connecting:", errc)
-            raise SystemExit(errc)
-        except requests.exceptions.Timeout as errt:
-            print("Timeout Error:", errt)
-            raise SystemExit(errt)
-        except requests.exceptions.RequestException as err:
-            print("Oops: Something Else", err)
-            raise SystemExit(err)
-        except Exception as ex:
-            print("exception", ex)
+            log_msg = f'HTTPError when calling external Geoservice at {geoservice_url}: {errh.response.status_code} - {errh.response.reason}'            
+            logger.exception(log_msg)
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.exception(
+                f'RequestException when calling external Geoservice at {geoservice_url}')
             return None
 
     @staticmethod
@@ -83,10 +75,8 @@ class GeoService:
 
         municipalities_geo_data = []
 
-        # Create shapely Points
-        points = []
-        for waypoint in waypoints:
-            points.append(Point(waypoint['lng'], waypoint['lat']))
+        # Create shapely Points  
+        points = [Point(waypoint['lng'], waypoint['lat']) for waypoint in waypoints]
 
         # iterate through points
         for i, pt in enumerate(points):
@@ -110,7 +100,7 @@ class GeoService:
                         municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
                                                       for polygon in entry['geometry']['coordinates']]
                     else:
-                        logger.warnig(f'Unknown geo_shape type {geo_shape_type}!')
+                        logger.warning(f'Unknown geo_shape type {geo_shape_type}!')
                         municipality['geo_shapes'] = []
 
                     municipalities_geo_data.append(municipality)
