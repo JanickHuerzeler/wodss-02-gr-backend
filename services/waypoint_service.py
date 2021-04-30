@@ -71,11 +71,11 @@ class WaypointService:
                     df_incidence_data = pd.DataFrame(columns={'bfsNr', 'date', 'incidence'})
                     df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
 
-                    logger.warnig(
+                    logger.warning(
                         f'No incidence found. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
 
         else:
-            logger.warnig(f'GeoService could not return any data for a given waypoints.')
+            logger.warning(f'GeoService could not return any data for a given waypoints.')
             return []
 
         result = df_municipalities_geo_data.merge(

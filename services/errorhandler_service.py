@@ -39,10 +39,10 @@ class ErrorHandlerService:
     def check_waypoints_array_format(waypoints):
         # Expected: [{"lat": 40.123, "lng": 8.123}]
         is_valid = all(
-            map(ErrorHandlerService._check_waypoint_format, waypoints))
+            map(ErrorHandlerService.__check_waypoint_format, waypoints))
 
         return is_valid
 
     @staticmethod
-    def _check_waypoint_format(waypoint):
+    def __check_waypoint_format(waypoint):
         return isinstance(waypoint, dict) and 'lat' in waypoint.keys() and isinstance(waypoint.get('lat'), float) and 'lng' in waypoint.keys() and isinstance(waypoint.get('lng'), float)
