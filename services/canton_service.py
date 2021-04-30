@@ -13,27 +13,26 @@ class CantonService:
 
     @staticmethod
     def get_municipalities(canton):
+        logger.info(
+            f'CantonService.get_municipalities(canton) with canton={canton}')
+
         if not CantonService.__isCantonAvailable(canton):
             return []
 
         try:
-            logger.info(
-                f'CantonService.get_municipalities(canton) with canton={canton}')
 
             municipalities = CantonService.__getMunicipalities(canton, None)
 
             logger.debug(
                 f'Got {len(municipalities)} municipalities from CantonService {canton}.')
 
-            result = []
-            for m in municipalities:
-                result.append(Municipality(**m).as_dict)
+            result = [Municipality(**m).as_dict for m in municipalities]
 
             return result
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warnig(log_msg)
+                logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
             return []
@@ -44,19 +43,19 @@ class CantonService:
 
     @staticmethod
     def get_municipality(canton, bfs_nr):
+        logger.info(
+            f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
+
         if not CantonService.__isCantonAvailable(canton):
             return {}
 
         try:
-            logger.info(
-                f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
-
             municipality = CantonService.__getMunicipalities(canton, bfs_nr)
             return Municipality(**municipality).as_dict
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warnig(log_msg)
+                logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
             return {}
@@ -67,13 +66,13 @@ class CantonService:
 
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        logger.info(
+            f'CantonService.get_incidences(canton, dateFrom, dateTo, bfs_nr=None) with canton={canton}, dateFrom={dateFrom}, dateTo={dateTo}, bfs_nr={bfs_nr}')
+
         if not CantonService.__isCantonAvailable(canton):
             return None
 
         try:
-            logger.info(
-                f'CantonService.get_incidences(canton, dateFrom, dateTo, bfs_nr=None) with canton={canton}, dateFrom={dateFrom}, dateTo={dateTo}, bfs_nr={bfs_nr}')
-
             if bfs_nr is None:
                 incidences = CantonService.__getIncidences(
                     canton, dateFrom, dateTo)
@@ -92,7 +91,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warnig(log_msg)
+                logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
             return None
@@ -158,5 +157,5 @@ class CantonService:
         if canton in CantonService.canton_api_urls and CantonService.canton_api_urls[canton]['url'] != '':
             return True
         else:
-            logger.warnig(f'Canton not available: {canton}')
+            logger.warning(f'Canton not available: {canton}')
             return False
