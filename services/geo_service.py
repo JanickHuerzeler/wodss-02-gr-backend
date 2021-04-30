@@ -31,7 +31,7 @@ class GeoService:
 
         geoservice_url = ConfigManager.get_instance().get_geoservice_url()
 
-        try:            
+        try:
             response = requests.get(geoservice_url, params=params)
             response_data = response.json()['records']
 
@@ -59,10 +59,10 @@ class GeoService:
             return result
 
         except requests.exceptions.HTTPError as errh:
-            log_msg = f'HTTPError when calling external Geoservice at {geoservice_url}: {errh.response.status_code} - {errh.response.reason}'            
+            log_msg = f'HTTPError when calling external Geoservice at {geoservice_url}: {errh.response.status_code} - {errh.response.reason}'
             logger.exception(log_msg)
             return None
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException:
             logger.exception(
                 f'RequestException when calling external Geoservice at {geoservice_url}')
             return None
@@ -71,11 +71,11 @@ class GeoService:
     def get_local_geodata(waypoints):
 
         if not use_local_geo_data:
-            raise Exception('Local geo data usage is not configured in config.json - data not initialized!')
+            raise RuntimeError('Local geo data usage is not configured in config.json - data not initialized!')
 
         municipalities_geo_data = []
 
-        # Create shapely Points  
+        # Create shapely Points
         points = [Point(waypoint['lng'], waypoint['lat']) for waypoint in waypoints]
 
         # iterate through points

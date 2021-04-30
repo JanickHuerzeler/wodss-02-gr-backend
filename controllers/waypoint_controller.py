@@ -20,6 +20,7 @@ waypoint_controller = Blueprint('waypoint_controller', __name__)
 df = ConfigManager.get_instance().get_required_date_format()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
 
+
 @app.route('/waypoints/', methods=['POST'])
 @cross_origin()
 @waypoint_controller.route('/waypoints/', methods=['POST'])
@@ -67,8 +68,8 @@ def post_waypoints():
         return 'Please provide some waypoints, empty array is not allowed.', 400
     elif not ErrorHandlerService.check_waypoints_array_format(waypoints):
         logger.debug(f'Invalid waypoints array format.')
-        return 'Array of waypoints must be of format: ["lat": 42.1234, "lng": 8.1234]', 400           
-    
+        return 'Array of waypoints must be of format: ["lat": 42.1234, "lng": 8.1234]', 400
+
     result = WaypointService.get_waypoints_data(waypoints)
 
     logger.debug(

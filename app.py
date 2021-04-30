@@ -30,15 +30,15 @@ redis_conn = redis.Redis(
     password=redis_server['password']
 )
 
-# Setup request_cache with redis backend
+# Setup request_cache with redis backend
 requests_cache.install_cache(cache_name='cantonservice_cache', backend='redis',
                              connection=redis_conn, secret_key=secret_key, expire_after=3600*4)  # 4h
 
-# Setup request_cache with sqlite backend
+# Setup request_cache with sqlite backend
 # requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4)  # 4h
 
 
-# Read local geojson data
+# Read local geojson data
 use_local_geo_data = ConfigManager.get_instance().get_use_local_geo_data()
 geolocal_filepath = ConfigManager.get_instance().get_geolocal_filepath()
 if use_local_geo_data:

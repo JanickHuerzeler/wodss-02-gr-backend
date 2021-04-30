@@ -8,7 +8,7 @@ import os
 class ConfigManager:
     __instance = None
 
-    __configFilePath = None
+    __config_file_path = None
     __secret = None
     __server_config = None
     __redis_server_config = None
@@ -18,7 +18,7 @@ class ConfigManager:
     __geoservice_url = None
     __geoservice_search_radius = None
     __geolocal_filepath = None
-    __incidence_retry_days = None    
+    __incidence_retry_days = None
     __use_local_geo_data = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,7 +32,7 @@ class ConfigManager:
 
     def __init__(self, config_path_string):
         if ConfigManager.__instance is not None:
-            raise Exception("This class is a singleton!")
+            raise RuntimeError("This class is a singleton!")
         else:
             ConfigManager.__instance = self
         self.logger = logging.getLogger('pywall.' + __name__)
@@ -40,9 +40,9 @@ class ConfigManager:
         self.load_config(config_path_string)
 
     def load_config(self, config_path_string):
-        self.__configFilePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_path_string)
+        self.__config_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_path_string)
 
-        with open(self.__configFilePath, 'r') as json_data:
+        with open(self.__config_file_path, 'r') as json_data:
             config = json.load(json_data)
             self.__secret = config['secret']
             self.__server_config = config['server']
@@ -53,11 +53,11 @@ class ConfigManager:
             self.__geoservice_url = config['geoservice_url']
             self.__geoservice_search_radius = config['geoservice_search_radius']
             self.__geolocal_filepath = config['geolocal_filepath']
-            self.__incidence_retry_days = config['incidence_retry_days']            
+            self.__incidence_retry_days = config['incidence_retry_days']
             self.__use_local_geo_data = config['use_local_geo_data']
 
     def log_configfile_path(self):
-        self.logger.info("ConfigFile-Path is: " + str(self.__configFilePath))
+        self.logger.info("ConfigFile-Path is: " + str(self.__config_file_path))
 
     def get_secret(self):
         return self.__secret

@@ -28,7 +28,7 @@ def handle_excpetion(e):
         logger.debug('A NotFound exception occurred.', exc_info=e)
         return e
     elif isinstance(e, redis.exceptions.ConnectionError):
-        logger.critical(f'Could not connect to redis server. Make sure it is started!',exc_info=e)
+        logger.critical(f'Could not connect to redis server. Make sure it is started!', exc_info=e)
         return InternalServerError(description='An instance of this application seems to be not running. Please contact the administrator of this app.')
     else:
         logger.critical('Unhandled Exception occurred', exc_info=e)
@@ -37,7 +37,7 @@ def handle_excpetion(e):
 
 if __name__ == '__main__':
     app.config['DEVELOPMENT'] = server_config["development"]
-    
+
     cors = CORS(app)
     app.config['CORS_HEADERS'] = 'Content-Type'
 

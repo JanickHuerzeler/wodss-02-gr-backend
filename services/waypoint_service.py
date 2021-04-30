@@ -44,7 +44,7 @@ class WaypointService:
 
         if unique_municipalities:
             df_municipalities_incidence_data = pd.DataFrame()
-            # For every found municipality, try to fetch corona data
+            # For every found municipality, try to fetch corona data
             for municipality in unique_municipalities:
                 incidence_data = CantonService.get_incidences(municipality['canton'], datetime.now().strftime(
                     df), datetime.now().strftime(df), municipality['bfs_nr'])
@@ -52,7 +52,7 @@ class WaypointService:
                 retry_count = 0
 
                 # If there was no data for 'today' go back one or two days and try to load those
-                # If incidence_data was None, the canton is not available, do not retry
+                # If incidence_data was None, the canton is not available, do not retry
                 while retry_count < 3 and incidence_data is not None:
                     retry_count += 1
                     logger.debug(
@@ -76,7 +76,7 @@ class WaypointService:
 
         else:
             logger.warning(f'GeoService could not return any data for a given waypoints.')
-            return []
+            return {}
 
         result = df_municipalities_geo_data.merge(
             df_municipalities_incidence_data, left_on='bfs_nr', right_on='bfsNr', how='left')
@@ -89,7 +89,7 @@ class WaypointService:
         # Normalize values from 0 to 750 into 0 to 1
         norm = matplotlib.colors.Normalize(vmin=0, vmax=750)
 
-        # Make gray when incidence it 0 or below or any other thing (should mark that it's missing)
+        # Make gray when incidence it 0 or below or any other thing (should mark that it's missing)
         result['incidence_color'] = result['incidence'].apply(
             lambda incidence: matplotlib.colors.rgb2hex(color_map(norm(incidence))))
 
