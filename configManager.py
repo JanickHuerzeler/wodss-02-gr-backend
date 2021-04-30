@@ -18,8 +18,7 @@ class ConfigManager:
     __geoservice_url = None
     __geoservice_search_radius = None
     __geolocal_filepath = None
-    __incidence_retry_days = None
-    __nth_waypoint_filter = None
+    __incidence_retry_days = None    
     __use_local_geo_data = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -54,8 +53,7 @@ class ConfigManager:
             self.__geoservice_url = config['geoservice_url']
             self.__geoservice_search_radius = config['geoservice_search_radius']
             self.__geolocal_filepath = config['geolocal_filepath']
-            self.__incidence_retry_days = config['incidence_retry_days']
-            self.__nth_waypoint_filter = config['nth_waypoint_filter']
+            self.__incidence_retry_days = config['incidence_retry_days']            
             self.__use_local_geo_data = config['use_local_geo_data']
 
     def log_configfile_path(self):
@@ -90,9 +88,6 @@ class ConfigManager:
 
     def get_incidence_retry_days(self):
         return self.__incidence_retry_days
-
-    def get_nth_waypoint_filter(self):
-        return self.__nth_waypoint_filter
 
     def get_use_local_geo_data(self):
         return self.__use_local_geo_data

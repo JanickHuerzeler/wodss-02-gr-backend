@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 df = ConfigManager.get_instance().get_required_date_format()
 incidence_retry_days: int = ConfigManager.get_instance().get_incidence_retry_days()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
-nth_waypoint_filter: int = ConfigManager.get_instance().get_nth_waypoint_filter()
 use_local_geo_data: bool = ConfigManager.get_instance().get_use_local_geo_data()
 
 
