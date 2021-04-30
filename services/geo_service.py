@@ -52,7 +52,7 @@ class GeoService:
                     municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
                                                   for polygon in entry['fields']['geo_shape']['coordinates']]
                 else:
-                    logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
+                    logger.warnig(f'Unknown geo_shape type {geo_shape_type}!')
                     municipality['geo_shapes'] = []
 
                 result.append(municipality)
@@ -110,7 +110,7 @@ class GeoService:
                         municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
                                                       for polygon in entry['geometry']['coordinates']]
                     else:
-                        logger.warn(f'Unknown geo_shape type {geo_shape_type}!')
+                        logger.warnig(f'Unknown geo_shape type {geo_shape_type}!')
                         municipality['geo_shapes'] = []
 
                     municipalities_geo_data.append(municipality)

@@ -33,7 +33,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warn(log_msg)
+                logger.warnig(log_msg)
             else:
                 logger.exception(log_msg)
             return []
@@ -56,7 +56,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getMunicipalities: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warn(log_msg)
+                logger.warnig(log_msg)
             else:
                 logger.exception(log_msg)
             return {}
@@ -92,7 +92,7 @@ class CantonService:
         except requests.exceptions.HTTPError as errh:
             log_msg = f'HTTPError when calling CantonService.__getIncidences: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
-                logger.warn(log_msg)
+                logger.warnig(log_msg)
             else:
                 logger.exception(log_msg)
             return None
@@ -158,5 +158,5 @@ class CantonService:
         if canton in CantonService.canton_api_urls and CantonService.canton_api_urls[canton]['url'] != '':
             return True
         else:
-            logger.warn(f'Canton not available: {canton}')
+            logger.warnig(f'Canton not available: {canton}')
             return False
