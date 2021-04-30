@@ -21,7 +21,8 @@ class ErrorHandlerService:
             return True
 
         try:
-            datetime.strptime(date, ConfigManager.get_instance().get_required_date_format())
+            datetime.strptime(
+                date, ConfigManager.get_instance().get_required_date_format())
             return True
         except ValueError:
             return False
@@ -33,3 +34,15 @@ class ErrorHandlerService:
             return True
 
         return date_from <= date_to
+
+    @staticmethod
+    def check_waypoints_array_format(waypoints):
+        # Expected: [{"lat": 40.123, "lng": 8.123}]
+        is_valid = all(
+            map(ErrorHandlerService._check_waypoint_format, waypoints))
+
+        return is_valid
+
+    @staticmethod
+    def _check_waypoint_format(waypoint):
+        return isinstance(waypoint, dict) and 'lat' in waypoint.keys() and isinstance(waypoint.get('lat'), float) and 'lng' in waypoint.keys() and isinstance(waypoint.get('lng'), float)

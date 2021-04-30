@@ -19,8 +19,6 @@ waypoint_controller = Blueprint('waypoint_controller', __name__)
 
 df = ConfigManager.get_instance().get_required_date_format()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
-nth_waypoint_filter: int = ConfigManager.get_instance().get_nth_waypoint_filter()
-
 
 @app.route('/waypoints/', methods=['POST'])
 @cross_origin()
@@ -55,35 +53,25 @@ def post_waypoints():
             description: Invalid format of the body or could not even parse it (needs application/json as Content-Type, hence body must be valid JSON too)
     """
 
+    logger.info(f'POST /waypoints/ was called.')
+
     try:
         waypoints = request.json  # forces use of 'application/json' content type!
     except Excpetion:
-        return 'Could not parse body as JSON.', 400
+        error_message = f'Could not parse request body as JSON.'
+        logger.debug(error_message)
+        return error_message, 400
 
-    logger.info(f'Got {len(waypoints)} waypoints.')
-
-    # TODO: Validate waypoints (not just simply the first as here)
+    # Validate waypoints
     if len(waypoints) == 0:
-        return 'Please provide some waypoints.', 204
-    elif waypoints[0] is None:
-        return 'Invalid waypoint.', 400
-    elif 'lat' not in waypoints[0].keys():
-        return 'Waypoint must include "lat" key.', 400
-    elif 'lng' not in waypoints[0].keys():
-        return 'Waypoint must include "lng" key.', 400
-
-    logger.info(f'Waypoints passed some easy validation. (only looked at first waypoint)')
-
-    # TODO: Should we still have this option? Currently we are always process all waypoints
-    # Take only every n-th waypoint
-    waypoints = waypoints[::nth_waypoint_filter]
-
-    logger.info(
-        f'Only working with subset of waypoints. (new length: {len(waypoints)}, nth_waypoint_filter: {nth_waypoint_filter})')
-
+        return 'Please provide some waypoints, empty array is not allowed.', 400
+    elif not ErrorHandlerService.check_waypoints_array_format(waypoints):
+        logger.debug(f'Invalid waypoints array format.')
+        return 'Array of waypoints must be of format: ["lat": 42.1234, "lng": 8.1234]', 400           
+    
     result = WaypointService.get_waypoints_data(waypoints)
 
-    logger.info(
+    logger.debug(
         f'Found {len(result)} unique municipalities for {len(waypoints)} waypoints')
 
     return jsonify(result)
