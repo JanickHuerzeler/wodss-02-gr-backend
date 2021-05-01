@@ -71,12 +71,12 @@ def get_municipalitiy_for_canton(canton, bfsNr):
           name: canton
           type: string
           required: true
-          description: canton
+          description: two-char canton abbreviation
         - in: path
           name: bfsNr
           type: string
           required: true
-          description: two-char canton abbreviation
+          description: bfsNr
     responses:
         200:
             description: municipalityMetadataDTO
