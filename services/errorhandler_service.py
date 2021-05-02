@@ -46,3 +46,7 @@ class ErrorHandlerService:
     @staticmethod
     def __check_waypoint_format(waypoint):
         return isinstance(waypoint, dict) and 'lat' in waypoint.keys() and isinstance(waypoint.get('lat'), float) and 'lng' in waypoint.keys() and isinstance(waypoint.get('lng'), float)
+
+    @staticmethod
+    def check_supported_language(language):
+        return language and language.lower() in [lng.lower() for lng in ConfigManager.get_instance().get_languages() if lng]

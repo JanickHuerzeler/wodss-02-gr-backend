@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 municipality_controller = Blueprint('municipality_controller', __name__)
 
 df = ConfigManager.get_instance().get_required_date_format()
+default_language = ConfigManager.get_instance().get_languages()[0]
 
 
 @app.route('/cantons/<canton>/municipalities/')
@@ -28,6 +29,11 @@ def get_municipalities_for_canton(canton):
           type: string
           required: true
           description: two-char canton abbreviation
+        - in: query
+          name: language
+          type: string
+          required: false
+          description: language tag (RFC 4646 format language_code-COUNTRY_CODE, e.g. "en-US")
     responses:
         200:
             description: Array of municipalityMetadataDTO
@@ -41,12 +47,20 @@ def get_municipalities_for_canton(canton):
             description: Canton not found
     """
 
+    # read query params
+    language = request.args['language'] if 'language' in request.args else ''
+
     logger.info(
-        f'GET /cantons/<canton>/municipalities/ was called. (canton: {canton})')
+        f'GET /cantons/<canton>/municipalities/ was called. (canton: {canton}, language: {language})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
         return canton_bad_request('Invalid format for parameter "canton" (required: 2 chars)', canton)
+
+    # check language
+    if not ErrorHandlerService.check_supported_language(language):
+        logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
+        language = default_language
 
     result = CantonService.get_municipalities(canton)
 
@@ -77,6 +91,11 @@ def get_municipalitiy_for_canton(canton, bfsNr):
           type: string
           required: true
           description: bfsNr
+        - in: query
+          name: language
+          type: string
+          required: false
+          description: language tag (RFC 4646 format language_code-COUNTRY_CODE, e.g. "en-US")
     responses:
         200:
             description: municipalityMetadataDTO
@@ -88,8 +107,11 @@ def get_municipalitiy_for_canton(canton, bfsNr):
             description: Canton or municipality not found
     """
 
+    # read query params
+    language = request.args['language'] if 'language' in request.args else ''
+
     logger.info(
-        f'GET /cantons/<canton>/municipalities/<bfsNr>/ was called. (canton: {canton}, bfsNr: {bfsNr})')
+        f'GET /cantons/<canton>/municipalities/<bfsNr>/ was called. (canton: {canton}, bfsNr: {bfsNr}, language: {language})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
@@ -98,6 +120,11 @@ def get_municipalitiy_for_canton(canton, bfsNr):
     # check bfs_nr format
     if not ErrorHandlerService.check_bfs_nr_format(bfsNr):
         return bfs_nr_bad_request('Invalid format for parameter "bfsNr" (required: 4-digit number)', bfsNr)
+
+    # check language
+    if not ErrorHandlerService.check_supported_language(language):
+        logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
+        language = default_language
 
     result = CantonService.get_municipality(canton, bfsNr)
 

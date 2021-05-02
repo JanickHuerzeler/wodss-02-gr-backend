@@ -128,5 +128,6 @@
   "geoservice_search_radius": 1000,
   "geolocal_filepath": "plz_verzeichnis_v2.geojson",
   "incidence_retry_days": 3,  
-  "use_local_geo_data": true
+  "use_local_geo_data": true,
+  "languages": ["de-DE", "en-GB"]
 }

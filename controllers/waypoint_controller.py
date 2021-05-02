@@ -19,6 +19,7 @@ waypoint_controller = Blueprint('waypoint_controller', __name__)
 
 df = ConfigManager.get_instance().get_required_date_format()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
+default_language = ConfigManager.get_instance().get_languages()[0]
 
 
 @app.route('/waypoints/', methods=['POST'])
@@ -41,6 +42,11 @@ def post_waypoints():
             type: array
             items:
                 $ref: '#/definitions/coordinateDTO'
+        - in: query
+          name: language
+          type: string
+          required: false
+          description: language tag (RFC 4646 format language_code-COUNTRY_CODE, e.g. "en-US")
     responses:
         200:
             description: Array of with unique MunicipalityDTOs that could be matched with the provided waypoint coordinates
@@ -54,7 +60,10 @@ def post_waypoints():
             description: Invalid format of the body or could not even parse it (needs application/json as Content-Type, hence body must be valid JSON too)
     """
 
-    logger.info(f'POST /waypoints/ was called.')
+    # read query params
+    language = request.args['language'] if 'language' in request.args else ''
+
+    logger.info(f'POST /waypoints/ was called. (language: {language})')
 
     try:
         waypoints = request.json  # forces use of 'application/json' content type!
@@ -69,6 +78,11 @@ def post_waypoints():
     elif not ErrorHandlerService.check_waypoints_array_format(waypoints):
         logger.debug(f'Invalid waypoints array format.')
         return 'Array of waypoints must be of format: ["lat": 42.1234, "lng": 8.1234]', 400
+
+    # check language
+    if not ErrorHandlerService.check_supported_language(language):
+        logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
+        language = default_language
 
     result = WaypointService.get_waypoints_data(waypoints)
 

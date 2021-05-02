@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 incidence_controller = Blueprint('incidence_controller', __name__)
 
 df = ConfigManager.get_instance().get_required_date_format()
+default_language = ConfigManager.get_instance().get_languages()[0]
 
 
 @app.route('/cantons/<canton>/incidences/')
@@ -31,13 +32,18 @@ def get_incidences_for_canton(canton):
         - in: query
           name: dateFrom
           type: string
-          example: 2021-03-01
+          example: "2021-03-01"
           description: dateFrom - dateFrom is inclusive. If not given, all datasets since beginning.
         - in: query
           name: dateTo
           type: string
-          example: 2021-03-31
+          example: "2021-03-31"
           description: dateTo - dateTo is inclusive. If not given, all datasets till today.
+        - in: query
+          name: language
+          type: string
+          required: false
+          description: language tag (RFC 4646 format language_code-COUNTRY_CODE, e.g. "en-US")
     responses:
         200:
             description: Array of incidenceDTO
@@ -51,13 +57,15 @@ def get_incidences_for_canton(canton):
             description: Canton not found
     """
 
+    # read query params
+    language = request.args['language'] if 'language' in request.args else ''
     date_from = request.args['dateFrom'] if 'dateFrom' in request.args else datetime.fromtimestamp(
         0).strftime(df)
     date_to = request.args['dateTo'] if 'dateTo' in request.args else datetime.today(
     ).strftime(df)
 
     logger.info(
-        f'GET /cantons/<canton>/incidences/ was called. (canton: {canton}, date_from: {date_from}, date_to: {date_to})')
+        f'GET /cantons/<canton>/incidences/ was called. (canton: {canton}, date_from: {date_from}, date_to: {date_to}, language: {language})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
@@ -70,6 +78,11 @@ def get_incidences_for_canton(canton):
         return date_bad_request(f'Invalid format for parameter "dateTo" (required: {df})', None, None, date_to)
     if not ErrorHandlerService.check_date_semantic(date_from, date_to):
         return date_bad_request('Invalid semantic in dates (required: dateFrom <= dateTo))', None, date_from, date_to)
+
+    # check language
+    if not ErrorHandlerService.check_supported_language(language):
+        logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
+        language = default_language
 
     result = CantonService.get_incidences(canton, date_from, date_to)
 
@@ -103,13 +116,18 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         - in: query
           name: dateFrom
           type: string
-          example: 2021-03-01
+          example: "2021-03-01"
           description: dateFrom - dateFrom is inclusive. If not given, all datasets since beginning.
         - in: query
           name: dateTo
           type: string
-          example: 2021-03-31
+          example: "2021-03-31"
           description: dateTo - dateTo is inclusive. If not given, all datasets till today.
+        - in: query
+          name: language
+          type: string
+          required: false
+          description: language tag (RFC 4646 format language_code-COUNTRY_CODE, e.g. "en-US")
     responses:
         200:
             description: Array of incidenceDTO
@@ -123,13 +141,15 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
           description: Canton or bfsNr not found
     """
 
+    # read query params
+    language = request.args['language'] if 'language' in request.args else ''
     date_from = request.args['dateFrom'] if 'dateFrom' in request.args else datetime.fromtimestamp(
         0).strftime(df)
     date_to = request.args['dateTo'] if 'dateTo' in request.args else datetime.today(
     ).strftime(df)
 
     logger.info(
-        f'GET /cantons/<canton>/municipalities/<bfsNr>/incidences/ was called. (canton: {canton}, bfsNr: {bfsNr}, date_from: {date_from}, date_to: {date_to})')
+        f'GET /cantons/<canton>/municipalities/<bfsNr>/incidences/ was called. (canton: {canton}, bfsNr: {bfsNr}, date_from: {date_from}, date_to: {date_to}, language: {language})')
 
     # check canton format
     if not ErrorHandlerService.check_canton_format(canton):
@@ -146,6 +166,11 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         return date_bad_request(f'Invalid format for parameter "dateTo" (required: {df})', bfsNr, None, date_to)
     if not ErrorHandlerService.check_date_semantic(date_from, date_to):
         return date_bad_request('Invalid semantic in dates (required: dateFrom <= dateTo))', bfsNr, date_from, date_to)
+
+    # check language
+    if not ErrorHandlerService.check_supported_language(language):
+        logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
+        language = default_language
 
     result = CantonService.get_incidences(canton, date_from, date_to, bfsNr)
 

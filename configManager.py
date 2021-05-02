@@ -20,6 +20,7 @@ class ConfigManager:
     __geolocal_filepath = None
     __incidence_retry_days = None
     __use_local_geo_data = None
+    __languages = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,6 +56,7 @@ class ConfigManager:
             self.__geolocal_filepath = config['geolocal_filepath']
             self.__incidence_retry_days = config['incidence_retry_days']
             self.__use_local_geo_data = config['use_local_geo_data']
+            self.__languages = config['languages']
 
     def log_configfile_path(self):
         self.logger.info("ConfigFile-Path is: " + str(self.__config_file_path))
@@ -91,3 +93,6 @@ class ConfigManager:
 
     def get_use_local_geo_data(self):
         return self.__use_local_geo_data
+
+    def get_languages(self):
+        return self.__languages
