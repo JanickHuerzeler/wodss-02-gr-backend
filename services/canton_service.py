@@ -134,7 +134,7 @@ class CantonService:
         response.raise_for_status()
 
         logger.debug(
-            f'Got response from CantonService {canton}. (url: {url}, from_cache: {response.from_cache if hasattr(response, "from_cache") else "nocache"}, with ssl verify: {(ssl_cert_path != "")})')
+            f'Got response from CantonService {canton}. (url: {url}, from_cache: {response.from_cache if hasattr(response, "from_cache") else "nocache"}, has SSL cert file: {(ssl_cert_path != "")})')
 
         return response
 
