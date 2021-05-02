@@ -47,3 +47,7 @@ if use_local_geo_data:
         geo_features = json.load(f)["features"]
 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+
+def get_app():
+    return app
