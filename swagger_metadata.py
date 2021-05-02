@@ -20,10 +20,14 @@ template = {
         "coordinateDTO": {
             "properties": {
                 "lat": {
-                    "type": "number"
+                    "type": "number",
+                    "format": "float",
+                    "example": 46.85337
                 },
                 "lng": {
-                    "type": "number"
+                    "type": "number",
+                    "format": "float",
+                    "example": 9.52982
                 }
             },
             "type": "object"
