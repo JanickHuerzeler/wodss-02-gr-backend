@@ -68,7 +68,7 @@ def post_waypoints():
 
     try:
         waypoints = request.json  # forces use of 'application/json' content type!
-    except Excpetion:
+    except Exception:
         error_message = f'Could not parse request body as JSON.'
         logger.debug(error_message)
         return error_message, 400
