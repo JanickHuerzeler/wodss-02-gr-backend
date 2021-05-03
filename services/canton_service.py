@@ -140,9 +140,9 @@ class CantonService:
 
         if ssl_cert_path != '':
             response = requests.get(
-                url, verify=ssl_cert_path, params=query_params, timeout=(1, 15))
+                url, verify=ssl_cert_path, params=query_params, timeout=(3.05, 15))
         else:
-            response = requests.get(url, params=query_params, timeout=(1, 15))
+            response = requests.get(url, params=query_params, timeout=(3.05, 15))
 
         response.raise_for_status()
 
