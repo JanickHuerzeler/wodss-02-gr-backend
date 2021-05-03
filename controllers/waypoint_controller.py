@@ -12,6 +12,7 @@ from services.errorhandler_service import ErrorHandlerService
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as pyplot
+from flask import make_response
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +85,14 @@ def post_waypoints():
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result = WaypointService.get_waypoints_data(waypoints)
+    result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
 
     logger.debug(
         f'Found {len(result)} unique municipalities for {len(waypoints)} waypoints')
 
-    return jsonify(result)
+    response = make_response(jsonify(result))
+    if timedout_cantons:
+        response.headers.set('Access-Control-Expose-Headers', 'X-Cantons-Timeout')
+        response.headers.set('X-Cantons-Timeout', timedout_cantons)
+
+    return response

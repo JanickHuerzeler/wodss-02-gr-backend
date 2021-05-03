@@ -55,6 +55,8 @@ def get_incidences_for_canton(canton):
             description: Invalid date or canton format
         404:
             description: Canton not found
+        408:
+            description: Canton or municipality servie timed out
     """
 
     # read query params
@@ -84,7 +86,10 @@ def get_incidences_for_canton(canton):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result = CantonService.get_incidences(canton, date_from, date_to)
+    result, status = CantonService.get_incidences(canton, date_from, date_to)
+
+    if status == 408:
+        return f'Canton service {canton} timed out', 408
 
     if result is None:
         error_message = f'No canton found for "{canton}".'
@@ -139,6 +144,8 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
             description: Invalid date, canton or bfsNr format
         404:
           description: Canton or bfsNr not found
+        408:
+            description: Canton or municipality servie timed out
     """
 
     # read query params
@@ -172,7 +179,10 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result = CantonService.get_incidences(canton, date_from, date_to, bfsNr)
+    result, status = CantonService.get_incidences(canton, date_from, date_to, bfsNr)
+
+    if status == 408:
+        return f'Canton service {canton} timed out', 408
 
     if result is None:
         error_message = f'No municipality found for bfsNr {bfsNr}.'

@@ -24,6 +24,7 @@ class WaypointService:
     def get_waypoints_data(waypoints) -> dict:
 
         municipalities_geo_data = []
+        timedout_cantons = set()
 
         if use_local_geo_data:
             logger.info('Use local geo data to retreive municipalities for coordinates')
@@ -46,7 +47,7 @@ class WaypointService:
             df_municipalities_incidence_data = pd.DataFrame()
             # For every found municipality, try to fetch corona data
             for municipality in unique_municipalities:
-                incidence_data = CantonService.get_incidences(municipality['canton'], datetime.now().strftime(
+                incidence_data, status = CantonService.get_incidences(municipality['canton'], datetime.now().strftime(
                     df), datetime.now().strftime(df), municipality['bfs_nr'])
 
                 retry_count = 0
@@ -60,13 +61,12 @@ class WaypointService:
 
                     delta_days = timedelta(days=retry_count)
 
-                    incidence_data = CantonService.get_incidences(municipality['canton'], (datetime.now() - delta_days).strftime(
+                    incidence_data, status = CantonService.get_incidences(municipality['canton'], (datetime.now() - delta_days).strftime(
                         df), (datetime.now() - delta_days).strftime(df), municipality['bfs_nr'])
 
                 if incidence_data:
                     df_incidence_data = pd.DataFrame.from_dict(incidence_data)
                     df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
-
                 else:
                     df_incidence_data = pd.DataFrame(columns={'bfsNr', 'date', 'incidence'})
                     df_municipalities_incidence_data = df_municipalities_incidence_data.append(df_incidence_data)
@@ -74,9 +74,13 @@ class WaypointService:
                     logger.warning(
                         f'No incidence found. (retry_count: {retry_count}, bfs_nr: {municipality["bfs_nr"]}, canton: {municipality["canton"]})')
 
+                if status == 408:
+                    timedout_cantons.add(municipality['canton'])
+                    logger.warning(f'Timeout occured for canton: {municipality["canton"]}')
+
         else:
             logger.warning(f'GeoService could not return any data for a given waypoints.')
-            return {}
+            return {}, None
 
         result = df_municipalities_geo_data.merge(
             df_municipalities_incidence_data, left_on='bfs_nr', right_on='bfsNr', how='left')
@@ -98,4 +102,4 @@ class WaypointService:
 
         print(result)
 
-        return result.to_dict('records')
+        return result.to_dict('records'), timedout_cantons

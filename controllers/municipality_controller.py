@@ -45,6 +45,8 @@ def get_municipalities_for_canton(canton):
             description: Invalid canton format
         404:
             description: Canton not found
+        408:
+            description: Canton or municipality servie timed out
     """
 
     # read query params
@@ -62,7 +64,10 @@ def get_municipalities_for_canton(canton):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result = CantonService.get_municipalities(canton)
+    result, status = CantonService.get_municipalities(canton)
+
+    if status == 408:
+        return f'Canton service {canton} timed out', 408
 
     if not result:
         error_message = f'No municipalities found for canton "{canton}".'
@@ -105,6 +110,8 @@ def get_municipalitiy_for_canton(canton, bfsNr):
             description: Invalid canton or bfsNr format
         404:
             description: Canton or municipality not found
+        408:
+            description: Canton or municipality servie timed out
     """
 
     # read query params
@@ -126,7 +133,10 @@ def get_municipalitiy_for_canton(canton, bfsNr):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result = CantonService.get_municipality(canton, bfsNr)
+    result, status = CantonService.get_municipality(canton, bfsNr)
+
+    if status == 408:
+        return f'Canton service {canton} timed out', 408
 
     if not result:
         error_message = f'No municipality found for canton "{canton}" and bfsNr "{bfsNr}".'
