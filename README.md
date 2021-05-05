@@ -111,8 +111,9 @@ open index.html
 Server wird gemäss Kantonsservice-[README.md](https://github.com/JanickHuerzeler/wodss-02-gr-canton-service#readme) bereits zur Verfügung gestellt.
 
 ### Docker Setup
-Für die Docker Engine Installation kann folgender Anleitung gefolgt werden:
+- Für die Docker Engine Installation kann folgender Anleitung gefolgt werden:
 https://docs.docker.com/engine/install/ubuntu/
+- Installation Docker Compose: https://docs.docker.com/compose/install/
 
-TODO: Docker Compose, Daemon Konfiguration (Autostart): https://docs.docker.com/config/daemon/
+TODO: Daemon Konfiguration (Autostart): https://docs.docker.com/config/daemon/
 --
