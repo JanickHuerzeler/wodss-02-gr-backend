@@ -105,3 +105,14 @@ open index.html
 ```
 
 ---
+
+## Live Environment
+
+Server wird gemäss Kantonsservice-[README.md](https://github.com/JanickHuerzeler/wodss-02-gr-canton-service#readme) bereits zur Verfügung gestellt.
+
+### Docker Setup
+Für die Docker Engine Installation kann folgender Anleitung gefolgt werden:
+https://docs.docker.com/engine/install/ubuntu/
+
+TODO: Docker Compose, Daemon Konfiguration (Autostart): https://docs.docker.com/config/daemon/
+--
