@@ -67,9 +67,9 @@ def post_waypoints():
     logger.info(f'POST /waypoints/ was called. (language: {language})')
 
     try:
-        waypoints = request.json  # forces use of 'application/json' content type!
+        waypoints = request.get_json(force=True)  # forces use of 'application/json' content type!
     except Exception:
-        error_message = f'Could not parse request body as JSON.'
+        error_message = f'Only accept body as JSON with content-type: application/json'
         logger.debug(error_message)
         return error_message, 400
 
