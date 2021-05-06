@@ -21,7 +21,7 @@ use_local_geo_data: bool = ConfigManager.get_instance().get_use_local_geo_data()
 class WaypointService:
 
     @staticmethod
-    def get_waypoints_data(waypoints) -> dict:
+    def get_waypoints_data(waypoints) -> (dict, set):
 
         municipalities_geo_data = []
         timedout_cantons = set()
