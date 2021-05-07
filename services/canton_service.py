@@ -1,4 +1,5 @@
 from configManager import ConfigManager
+from datetime import datetime
 import logging
 import requests
 from service_models.municipality import Municipality
@@ -10,6 +11,10 @@ logger = logging.getLogger(__name__)
 class CantonService:
 
     canton_api_urls = ConfigManager.get_instance().get_cantonservice_urls()
+
+    @staticmethod
+    def get_default_date():
+        return datetime.now()
 
     @staticmethod
     def get_municipalities(canton):
