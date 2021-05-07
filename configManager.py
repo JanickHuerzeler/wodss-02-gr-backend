@@ -21,6 +21,7 @@ class ConfigManager:
     __incidence_retry_days = None
     __use_local_geo_data = None
     __languages = None
+    __no_incidence_color = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -57,6 +58,7 @@ class ConfigManager:
             self.__incidence_retry_days = config['incidence_retry_days']
             self.__use_local_geo_data = config['use_local_geo_data']
             self.__languages = config['languages']
+            self.__no_incidence_color = config['no_incidence_color']
 
     def log_configfile_path(self):
         self.logger.info("ConfigFile-Path is: " + str(self.__config_file_path))
@@ -96,3 +98,6 @@ class ConfigManager:
 
     def get_languages(self):
         return self.__languages
+    
+    def get_no_incidence_color(self):
+        return self.__no_incidence_color
