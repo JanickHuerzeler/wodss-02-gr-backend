@@ -22,7 +22,7 @@ class MockCantonServiceResponse:
         dateFrom_date = datetime.strptime(dateFrom, df)
         dateTo_date = datetime.strptime(dateTo, df)
 
-        filtered_result = [i for i in result if (i['bfsNr'] == bfs_nr or bfs_nr == None) and datetime.strptime(
+        filtered_result = [i for i in result if (i['bfsNr'] == bfs_nr or bfs_nr is None) and datetime.strptime(
             i['date'], df) >= dateFrom_date and datetime.strptime(i['date'], df) <= dateTo_date]
         return filtered_result, None
 
@@ -31,7 +31,7 @@ class MockCantonServiceResponse:
         return None, None
 
     @staticmethod
-    def get_incidences_timeout():        
+    def get_incidences_timeout():
         return None, 408
 
     @staticmethod
@@ -221,9 +221,9 @@ def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canto
     assert 'bfs_nr' in result[0].keys()
     assert result[0]['bfs_nr'] == 3882
     assert 'incidence_date' in result[0].keys()
-    assert result[0]['incidence_date'] == None
+    assert result[0]['incidence_date'] is None
     assert 'incidence' in result[0].keys()
-    assert result[0]['incidence'] == None
+    assert result[0]['incidence'] is None
     assert 'incidence_color' in result[0].keys() 
 
 def test_still_returning_municipality_data_when_canton_service_has_error(client, app, mock_canton_service_error, mock_canton_service_date):
@@ -240,9 +240,9 @@ def test_still_returning_municipality_data_when_canton_service_has_error(client,
     assert 'bfs_nr' in result[0].keys()
     assert result[0]['bfs_nr'] == 3882
     assert 'incidence_date' in result[0].keys()
-    assert result[0]['incidence_date'] == None
+    assert result[0]['incidence_date'] is None
     assert 'incidence' in result[0].keys()
-    assert result[0]['incidence'] == None
+    assert result[0]['incidence'] is None
     assert 'incidence_color' in result[0].keys()
     assert result[0]['incidence_color'] == '#000000'
 
@@ -262,11 +262,20 @@ def test_still_returning_municipality_data_when_canton_service_has_timeout(clien
     assert 'bfs_nr' in result[0].keys()
     assert result[0]['bfs_nr'] == 3882
     assert 'incidence_date' in result[0].keys()
-    assert result[0]['incidence_date'] == None
+    assert result[0]['incidence_date'] is None
     assert 'incidence' in result[0].keys()
-    assert result[0]['incidence'] == None
+    assert result[0]['incidence'] is None
     assert 'incidence_color' in result[0].keys()
     assert result[0]['incidence_color'] == '#000000'
 
+def test_waypoints_outside_switzerland(client, app, mock_canton_service, mock_canton_service_date):
+    # Given
+    waypoints = [{"lat": 52.51668151528021,
+                  "lng": 13.37775078600967}]  # Berlin
 
-# TODO: test GeoService no data
+    # When
+    result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
+
+    # Then
+    assert result == {}
+    assert timedout_cantons is None
