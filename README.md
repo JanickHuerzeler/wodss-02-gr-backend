@@ -59,6 +59,17 @@ docker-compose up -d
 
 ---
 
+## Dev-Environment starten
+Nachdem die vorhergehenden Schritte ausgeführt wurden, kann auch der lokale Flask Server gestartet werden:
+
+``` CMD/ZSH
+python server.py
+```
+
+Dieser ist unter [http://localhost:5001](http://localhost:5001) erreichbar und zeigt direkt das Swagger UI an.
+
+---
+
 ## Unit Tests
 
 Als Test Framework wird `pytest` verwendet.
