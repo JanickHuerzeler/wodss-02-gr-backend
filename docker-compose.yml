@@ -2,6 +2,7 @@ version: "3.2"
 services:
   redis:
     container_name: redis
+    restart: always
     image: "redis:alpine"
     environment:
       - REDIS_PASSWORD=redis
