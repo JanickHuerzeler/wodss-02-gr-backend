@@ -46,7 +46,7 @@ class WaypointService:
         df_municipalities_geo_data = pd.DataFrame.from_dict(
             municipalities_geo_data)
         df_municipalities_geo_data.drop_duplicates(
-            subset=['name'], inplace=True)
+            subset=['plz'], inplace=True)
 
         unique_municipalities = df_municipalities_geo_data.drop_duplicates(
             subset=['bfs_nr']).to_dict('records')

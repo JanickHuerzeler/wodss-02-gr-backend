@@ -89,7 +89,7 @@ class GeoService:
                     municipality = {}
                     municipality['bfs_nr'] = entry['properties']['bfsnr']
                     municipality['canton'] = entry['properties']['kanton']
-                    municipality['plz'] = entry['properties']['gplz']
+                    municipality['plz'] = entry['properties']['postleitzahl']
                     municipality['name'] = entry['properties']['ortbez27']
 
                     geo_shape_type = entry['geometry']['type']
