@@ -92,7 +92,7 @@ class WaypointService:
 
         else:
             logger.warning(
-                f'GeoService could not return any data for a given waypoints.')
+                f'GeoService could not return any data for the given waypoints.')
             return {}, None
 
         result = df_municipalities_geo_data.merge(
