@@ -125,6 +125,9 @@ def mock_canton_service_date_four_days_back(monkeypatch):
 
 
 def test_single_waypoint_in_kueblis_gr(client, app, mock_canton_service, mock_canton_service_date):
+    """
+    Test a single waypoint which lies in Küblis GR returns expected municipality and incidence data
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -151,6 +154,9 @@ def test_single_waypoint_in_kueblis_gr(client, app, mock_canton_service, mock_ca
 
 
 def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_service, mock_canton_service_date_one_day_back):
+    """
+    Test a single waypoint which lies in Küblis GR return expected municipality data and one time retries to get incidence data
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -170,6 +176,9 @@ def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_ser
     assert 'incidence_color' in result[0].keys()
 
 def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_service, mock_canton_service_date_two_days_back):
+    """
+    Test a single waypoint which lies in Küblis GR return expected municipality data and two times retries to get incidence data
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -189,6 +198,9 @@ def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_se
     assert 'incidence_color' in result[0].keys()
 
 def test_single_waypoint_in_kueblis_gr_retry_3_times(client, app, mock_canton_service, mock_canton_service_date_three_days_back):
+    """
+    Test a single waypoint which lies in Küblis return expected municipality data and three times retries to get incidence data
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -207,6 +219,9 @@ def test_single_waypoint_in_kueblis_gr_retry_3_times(client, app, mock_canton_se
     assert 'incidence_color' in result[0].keys()
 
 def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canton_service, mock_canton_service_date_four_days_back):
+    """
+    Test a single waypoint which lies in Küblis return expected municipality data but stops after three retries and return no incidence data
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -227,6 +242,9 @@ def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canto
     assert 'incidence_color' in result[0].keys() 
 
 def test_still_returning_municipality_data_when_canton_service_has_error(client, app, mock_canton_service_error, mock_canton_service_date):
+    """
+    Test return values when canton service had an error (i.e. the incidence_color) and that municipality data still gets returned
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -247,6 +265,9 @@ def test_still_returning_municipality_data_when_canton_service_has_error(client,
     assert result[0]['incidence_color'] == '#000000'
 
 def test_still_returning_municipality_data_when_canton_service_has_timeout(client, app, mock_canton_service_timeout, mock_canton_service_date):
+    """
+    Test return values when a canton service had a timeout (i.e. the timedout_cantons set) and that municipality data still gets returned
+    """
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -269,6 +290,9 @@ def test_still_returning_municipality_data_when_canton_service_has_timeout(clien
     assert result[0]['incidence_color'] == '#000000'
 
 def test_waypoints_outside_switzerland(client, app, mock_canton_service, mock_canton_service_date):
+    """
+    Test that waypoints outside Switzerland do not break the waypoint service, but return an empty result
+    """
     # Given
     waypoints = [{"lat": 52.51668151528021,
                   "lng": 13.37775078600967}]  # Berlin
