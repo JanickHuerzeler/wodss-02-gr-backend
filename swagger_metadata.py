@@ -12,8 +12,8 @@ template = {
     #   "host": "mysite.com",  # overrides localhost:500
     "basePath": "/",  # base bash for blueprint registration
     "schemes": [
-        "http",
-        "https"
+        "https",
+        "http"
     ],
     "operationId": "getmyData",
     "definitions": {

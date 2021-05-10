@@ -12,7 +12,7 @@ from swagger_metadata import template
 app = Flask(__name__)
 
 # Setup swagger
-swagger = Swagger(app, template=template)
+swagger = Swagger(app, template=template, config={"specs_route": "/"}, merge=True)
 
 # Setup logging
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'log.conf')
