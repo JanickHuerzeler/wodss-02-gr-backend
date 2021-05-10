@@ -57,7 +57,10 @@ class MockCantonServiceResponse:
 
 @pytest.fixture
 def mock_canton_service(monkeypatch):
+    pytest.mock_get_incidences_count = 0
+
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        pytest.mock_get_incidences_count += 1
         return MockCantonServiceResponse().get_incidences(canton, dateFrom, dateTo, bfs_nr)
 
     monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
@@ -71,7 +74,7 @@ def mock_canton_service_error(monkeypatch):
 
 @pytest.fixture
 def mock_canton_service_timeout(monkeypatch):
-    def mock_get_incidences(canton, dateFrom, adteTo, bfs_nr=None):
+    def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         return MockCantonServiceResponse().get_incidences_timeout()
 
     monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
@@ -156,6 +159,7 @@ def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_ser
     result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
 
     # Then
+    assert pytest.mock_get_incidences_count == 2
     assert timedout_cantons == set()
     assert len(result) == 1  # Only Küblis
     assert 'bfs_nr' in result[0].keys()
@@ -174,6 +178,7 @@ def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_se
     result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
 
     # Then
+    assert pytest.mock_get_incidences_count == 3
     assert timedout_cantons == set()
     assert len(result) == 1  # Only Küblis
     assert 'bfs_nr' in result[0].keys()
@@ -210,6 +215,7 @@ def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canto
     result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
 
     # Then
+    assert pytest.mock_get_incidences_count == 4
     assert timedout_cantons == set()
     assert len(result) == 1  # Only Küblis
     assert 'bfs_nr' in result[0].keys()
