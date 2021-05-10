@@ -31,6 +31,10 @@ class MockCantonServiceResponse:
         return None, None
 
     @staticmethod
+    def get_incidences_timeout():        
+        return None, 408
+
+    @staticmethod
     def get_default_date():
         return datetime(2021, 4, 23)
 
@@ -62,6 +66,13 @@ def mock_canton_service(monkeypatch):
 def mock_canton_service_error(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         return MockCantonServiceResponse().get_incidences_error()
+
+    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+
+@pytest.fixture
+def mock_canton_service_timeout(monkeypatch):
+    def mock_get_incidences(canton, dateFrom, adteTo, bfs_nr=None):
+        return MockCantonServiceResponse().get_incidences_timeout()
 
     monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
 
@@ -209,7 +220,7 @@ def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canto
     assert result[0]['incidence'] == None
     assert 'incidence_color' in result[0].keys() 
 
-def test_canton_service_has_error_still_returns_municipality_data(client, app, mock_canton_service_error, mock_canton_service_date):
+def test_still_returning_municipality_data_when_canton_service_has_error(client, app, mock_canton_service_error, mock_canton_service_date):
     # Given
     waypoints = [{"lat": 46.91455411444433,
                   "lng": 9.776835128169601}]  # Küblis
@@ -229,4 +240,17 @@ def test_canton_service_has_error_still_returns_municipality_data(client, app, m
     assert 'incidence_color' in result[0].keys()
     assert result[0]['incidence_color'] == '#000000'
 
-# TODO: Test timeouts, test GeoService no data
+def test_still_returning_municipality_data_when_canton_service_has_timeout(client, app, mock_canton_service_timeout, mock_canton_service_date):
+    # Given
+    waypoints = [{"lat": 46.91455411444433,
+                  "lng": 9.776835128169601}]  # Küblis
+
+    # When
+    result, timedout_cantons = WaypointService.get_waypoints_data(waypoints)
+
+    # Then
+    assert len(timedout_cantons) == 1
+    assert 'GR' in timedout_cantons
+
+
+# TODO: test GeoService no data
