@@ -6,6 +6,7 @@ from app import app
 import logging
 from services.canton_service import CantonService
 from services.errorhandler_service import ErrorHandlerService
+from flask_cors import cross_origin
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ default_language = ConfigManager.get_instance().get_languages()[0]
 
 
 @app.route('/cantons/<canton>/municipalities/')
+@cross_origin()
 @municipality_controller.route('/cantons/<canton>/municipalities/', methods=['GET'])
 def get_municipalities_for_canton(canton):
     """
@@ -78,6 +80,7 @@ def get_municipalities_for_canton(canton):
 
 
 @app.route('/cantons/<canton>/municipalities/<bfsNr>/')
+@cross_origin()
 @municipality_controller.route('/cantons/<canton>/municipalities/<bfsNr>/', methods=['GET'])
 def get_municipalitiy_for_canton(canton, bfsNr):
     """

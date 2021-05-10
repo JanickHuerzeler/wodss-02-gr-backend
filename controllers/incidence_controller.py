@@ -6,6 +6,7 @@ from app import app
 import logging
 from services.canton_service import CantonService
 from services.errorhandler_service import ErrorHandlerService
+from flask_cors import cross_origin
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ default_language = ConfigManager.get_instance().get_languages()[0]
 
 
 @app.route('/cantons/<canton>/incidences/')
+@cross_origin()
 @incidence_controller.route('/cantons/<canton>/incidences/', methods=['GET'])
 def get_incidences_for_canton(canton):
     """
@@ -100,6 +102,7 @@ def get_incidences_for_canton(canton):
 
 
 @app.route('/cantons/<canton>/municipalities/<bfsNr>/incidences/')
+@cross_origin()
 @incidence_controller.route('/cantons/<canton>/municipalities/<bfsNr>/incidences/', methods=['GET'])
 def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
     """
