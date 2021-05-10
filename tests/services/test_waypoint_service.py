@@ -251,6 +251,16 @@ def test_still_returning_municipality_data_when_canton_service_has_timeout(clien
     # Then
     assert len(timedout_cantons) == 1
     assert 'GR' in timedout_cantons
+    # Municipality data:
+    assert len(result) == 1  # Only Küblis
+    assert 'bfs_nr' in result[0].keys()
+    assert result[0]['bfs_nr'] == 3882
+    assert 'incidence_date' in result[0].keys()
+    assert result[0]['incidence_date'] == None
+    assert 'incidence' in result[0].keys()
+    assert result[0]['incidence'] == None
+    assert 'incidence_color' in result[0].keys()
+    assert result[0]['incidence_color'] == '#000000'
 
 
 # TODO: test GeoService no data
