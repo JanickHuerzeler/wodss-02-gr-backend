@@ -48,7 +48,7 @@ def get_municipalities_for_canton(canton):
         404:
             description: Canton not found
         408:
-            description: Canton or municipality servie timed out
+            description: Canton or municipality service timed out
     """
 
     # read query params
@@ -114,7 +114,7 @@ def get_municipalitiy_for_canton(canton, bfsNr):
         404:
             description: Canton or municipality not found
         408:
-            description: Canton or municipality servie timed out
+            description: Canton or municipality service timed out
     """
 
     # read query params
