@@ -285,7 +285,7 @@ def test_single_timedout_canton(client, app, mock_waypoint_service_single_timedo
     assert response.headers["Content-Type"] == content_type_json
     assert response.json == {}
     assert canton_service_timeout_header in response.headers
-    assert response.headers[canton_service_timeout_header] == "{'AG'}"
+    assert response.headers[canton_service_timeout_header] == "AG"
     # Test if header is correctly exposed
     assert access_control_expose_headers in response.headers
     assert canton_service_timeout_header in response.headers[access_control_expose_headers]
@@ -309,9 +309,9 @@ def test_multiple_timedout_cantons(client, app, mock_waypoint_service_multiple_t
     assert response.json == {}
     assert canton_service_timeout_header in response.headers
     # Set us unordered, so test with string contains:
-    assert "'AG'" in response.headers[canton_service_timeout_header]
-    assert "'TG'" in response.headers[canton_service_timeout_header]
-    assert "'ZH'" in response.headers[canton_service_timeout_header]
+    assert "AG" in response.headers[canton_service_timeout_header]
+    assert "TG" in response.headers[canton_service_timeout_header]
+    assert "ZH" in response.headers[canton_service_timeout_header]
     # Test if header is correctly exposed
     assert access_control_expose_headers in response.headers
     assert canton_service_timeout_header in response.headers[access_control_expose_headers]

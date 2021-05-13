@@ -93,6 +93,6 @@ def post_waypoints():
     response = make_response(jsonify(result))
     if timedout_cantons:
         response.headers.set('Access-Control-Expose-Headers', 'X-Cantons-Timeout')
-        response.headers.set('X-Cantons-Timeout', timedout_cantons)
+        response.headers.set('X-Cantons-Timeout', (", ").join(timedout_cantons))
 
     return response
