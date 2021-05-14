@@ -58,7 +58,7 @@ def get_incidences_for_canton(canton):
         404:
             description: Canton not found
         408:
-            description: Canton or municipality servie timed out
+            description: Canton or municipality service timed out
         502:
             description: Canton service returned unsuccessful status code
     """
@@ -154,7 +154,7 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         404:
           description: Canton or bfsNr not found
         408:
-            description: Canton or municipality servie timed out
+            description: Canton or municipality service timed out
         502:
             description: Canton service returned unsuccessful status code
     """
