@@ -22,6 +22,7 @@ class ConfigManager:
     __no_incidence_color = None
     __min_incidence_normalize_value = None
     __max_incidence_normalize_value = None
+    __redis_caching_hours = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -59,6 +60,7 @@ class ConfigManager:
             self.__no_incidence_color = config['no_incidence_color']
             self.__min_incidence_normalize_value = config['min_incidence_normalize_value']
             self.__max_incidence_normalize_value = config['max_incidence_normalize_value']
+            self.__redis_caching_hours = config['redis_caching_hours']
 
     def log_configfile_path(self):
         self.logger.info("ConfigFile-Path is: " + str(self.__config_file_path))
@@ -101,3 +103,6 @@ class ConfigManager:
 
     def get_max_incidence_normalize_value(self):
         return self.__max_incidence_normalize_value
+
+    def get_redis_caching_hours(self):
+        return self.__redis_caching_hours

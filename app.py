@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 redis_server = ConfigManager.get_instance().get_redis_server_config()
 secret_key = ConfigManager.get_instance().get_secret()
+redis_caching_hours: float = ConfigManager.get_instance().get_redis_caching_hours()
 
 redis_conn = redis.Redis(
     host=redis_server['host'],
@@ -32,7 +33,7 @@ redis_conn = redis.Redis(
 
 # Setup request_cache with redis backend
 requests_cache.install_cache(cache_name='cantonservice_cache', backend='redis',
-                             connection=redis_conn, secret_key=secret_key, expire_after=3600*4)  # 4h
+                             connection=redis_conn, secret_key=secret_key, expire_after=3600*redis_caching_hours)  # in s, default 4h
 
 # Setup request_cache with sqlite backend
 # requests_cache.install_cache(cache_name='cantonservice_cache', backend='sqlite', expire_after=3600*4)  # 4h
