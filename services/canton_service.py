@@ -45,11 +45,11 @@ class CantonService:
                 logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
-            return [], None
+            return None, None
         except requests.exceptions.RequestException:
             logger.exception(
                 'Exception when calling CantonService.__get_municipalities or processing its response.')
-            return [], None
+            return None, None
 
     @staticmethod
     def get_municipality(canton, bfs_nr):
@@ -57,7 +57,7 @@ class CantonService:
             f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
 
         if not CantonService.__is_canton_available(canton):
-            return {}, 404
+            return None, 404
 
         try:
             municipality = CantonService.__get_municipalities(canton, bfs_nr)
@@ -72,11 +72,11 @@ class CantonService:
                 logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
-            return {}, None
+            return None, None
         except requests.exceptions.RequestException:
             logger.exception(
                 'Exception when calling CantonService.__get_municipalities or processing its response.')
-            return {}, None
+            return None, None
 
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):

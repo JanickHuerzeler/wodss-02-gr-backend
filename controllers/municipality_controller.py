@@ -49,6 +49,8 @@ def get_municipalities_for_canton(canton):
             description: Canton not found
         408:
             description: Canton or municipality service timed out
+        502:
+            description: Canton service returned unsuccessful status code
     """
 
     # read query params
@@ -73,7 +75,11 @@ def get_municipalities_for_canton(canton):
     elif status == 404:
         return f'No canton found for "{canton}".', 404
 
-    if not result:
+    if result is None:
+        error_message = f'Could not get data from canton service "{canton}".'
+        logger.debug(error_message)
+        return error_message, 502
+    elif not result:
         error_message = f'No municipalities found for canton "{canton}".'
         logger.debug(error_message)
         return error_message, 404
@@ -117,6 +123,8 @@ def get_municipalitiy_for_canton(canton, bfsNr):
             description: Canton or municipality not found
         408:
             description: Canton or municipality service timed out
+        502:
+            description: Canton service returned unsuccessful status code
     """
 
     # read query params
@@ -145,7 +153,11 @@ def get_municipalitiy_for_canton(canton, bfsNr):
     elif status == 404:
         return f'No canton found for "{canton}".', 404
 
-    if not result:
+    if result is None:
+        error_message = f'Could not get data from canton service "{canton}" for bfsNr "{bfsNr}".'
+        logger.debug(error_message)
+        return error_message, 502
+    elif not result:
         error_message = f'No municipality found for canton "{canton}" and bfsNr "{bfsNr}".'
         logger.debug(error_message)
         return error_message, 404

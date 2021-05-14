@@ -34,19 +34,19 @@ class MockCantonServiceResponse:
 
     @staticmethod
     def get_municipalities_unavailable_canton(canton):
-        return [], 404
+        return None, 404
 
     @staticmethod
     def get_municipality_unavailable_canton(canton, bfs_nr):
-        return {}, 404
+        return None, 404
 
     @staticmethod
     def get_municipalities_canton_service_error(canton):
-        return [], None
+        return None, None
 
     @staticmethod
     def get_municipality_canton_service_error(canton, bfs_nr):
-        return {}, None
+        return None, None
 
     @staticmethod
     def get_municipalities_timedout(canton):
@@ -55,6 +55,14 @@ class MockCantonServiceResponse:
     @staticmethod
     def get_municpality_timedout(canton, bfs_nr):
         return None, 408
+
+    @staticmethod
+    def get_municipalities_no_data(canton):
+        return [], None
+
+    @staticmethod
+    def get_municipality_no_data(canton, bfs_nr):
+        return {}, None
 
 
 @pytest.fixture
@@ -104,6 +112,20 @@ def mock_canton_service_error(monkeypatch):
     monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
     monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
 
+
+@pytest.fixture
+def mock_canton_service_no_data(monkeypatch):
+    def mock_get_municipalities(canton):
+        return MockCantonServiceResponse().get_municipalities_no_data(canton)
+
+    def mock_get_municipality(canton, bfs_nr):
+        return MockCantonServiceResponse().get_municipality_no_data(canton, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+
+
+
 """
 GET /cantons/<canton>/municipalities/
 """
@@ -129,6 +151,11 @@ def test_municipalities_base_route(client, app, mock_canton_service):
 
 
 def test_municipalities_unavailable_canton(client, app, mock_canton_service_unavailable_canton):
+    """
+    Check if a provided canton, that has no corresponding canton service implemented, returns
+    - status code 404
+    - Error message stating no canton service was found for given canton
+    """
     # Given
     unavailable_canton = 'VD'
     url = application_root+'cantons/'+unavailable_canton+'/municipalities/'
@@ -144,6 +171,11 @@ def test_municipalities_unavailable_canton(client, app, mock_canton_service_unav
 
 
 def test_municipalities_invalid_canton_format(client, app, mock_canton_service):
+    """
+    Check if invalid canton format returns
+    - status code 400
+    - error message describing the proper canton format
+    """
     # Given
     invalid_canton = 'GRR'
     url = application_root+'cantons/'+invalid_canton+'/municipalities/'
@@ -158,6 +190,11 @@ def test_municipalities_invalid_canton_format(client, app, mock_canton_service):
 
 
 def test_municipalities_canton_service_timedout(client, app, mock_canton_service_timedout):
+    """
+    Check if a timeout in canton service returns
+    - status code 408
+    - error message describing which canton had a timeout 
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'
 
@@ -171,6 +208,29 @@ def test_municipalities_canton_service_timedout(client, app, mock_canton_service
 
 
 def test_municipalities_canton_service_error(client, app, mock_canton_service_error):
+    """
+    Check if error in canton service returns
+    - status code  502
+    - error message describing canton service that had the error
+    """
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_municipalities_canton_no_data(client, app, mock_canton_service_no_data):
+    """
+    Check if empty result set returns
+    - status code 404
+    - error message describing no municpalities found
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'
 
@@ -182,7 +242,14 @@ def test_municipalities_canton_service_error(client, app, mock_canton_service_er
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'No municipalities found for canton "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
+
 def test_municipalities_wrong_language_still_works(client, app, mock_canton_service, caplog):
+    """
+    Check if request with unsupported language returns
+    - still status code 200
+    - still json data
+    - made entry into log switching to default language
+    """
     # Given    
     url = application_root+'cantons/' + MOCK_CANTON + '/municipalities/'
 
@@ -225,6 +292,11 @@ def test_municipality_base_route_with_bfs_nr(client, app, mock_canton_service):
 
 
 def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_canton_service_unavailable_canton):
+    """
+    Check if a provided canton, that has no corresponding canton service implemented, returns
+    - status code 404
+    - Error message stating no canton service was found for given canton
+    """
     # Given
     unavailable_canton = 'VD'
     unavailable_bfs_nr = 5401  # Aigle
@@ -240,6 +312,11 @@ def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_canton_se
 
 
 def test_municipality_invalid_canton_format(client, app, mock_canton_service):
+    """
+    Check if invalid canton format returns
+    - status code 400
+    - error message describing the proper canton format
+    """
     # Given
     invalid_canton = 'AGR'
     bfs_nr = 3544  # Bergün Filisur
@@ -255,6 +332,11 @@ def test_municipality_invalid_canton_format(client, app, mock_canton_service):
 
 
 def test_municipality_canton_service_timedout(client, app, mock_canton_service_timedout):
+    """
+    Check if a timeout in canton service returns
+    - status code 408
+    - error message describing which canton had a timeout 
+    """
     # Given
     bfs_nr = 3544  # Bergün Filisur
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + str(bfs_nr) + '/'
@@ -268,7 +350,31 @@ def test_municipality_canton_service_timedout(client, app, mock_canton_service_t
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
 
-def test_municipaliy_canton_service_error(client, app, mock_canton_service_error):
+def test_municipality_canton_service_error(client, app, mock_canton_service_error):
+    """
+    Check if error in canton service returns
+    - status code  502
+    - error message describing canton service that had the error
+    """
+    # Given
+    bfs_nr = 3544  # Bergün Filisur
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + str(bfs_nr) + '/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" for bfsNr "{bfs_nr}".', encoding='utf8') in response.get_data()
+
+
+def test_municipality_canton_service_no_data(client, app, mock_canton_service_no_data):
+    """
+    Check if empty result set (e.g. municipality not found in canton) returns
+    - status code 404
+    - error message describing no municpalities found
+    """
     # Given
     bfs_nr = 3544  # Bergün Filisur
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + str(bfs_nr) + '/'
@@ -283,6 +389,11 @@ def test_municipaliy_canton_service_error(client, app, mock_canton_service_error
 
 
 def test_municipality_wrong_bfs_nr_format(client, app, mock_canton_service):
+    """
+    Check if wrong bfsNr format returns
+    - status code 400
+    - error message describing correct bfsNr format
+    """
     # Given
     bfs_nr = '3544-12'
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + bfs_nr + '/'
@@ -297,6 +408,12 @@ def test_municipality_wrong_bfs_nr_format(client, app, mock_canton_service):
 
 
 def test_municipality_wrong_language_still_works(client, app, mock_canton_service, caplog):
+    """
+    Check if request with unsupported language returns
+    - still status code 200
+    - still json data
+    - made entry into log switching to default language
+    """
     # Given
     bfs_nr = 3506  # Vaz/Obervaz
     url = application_root+'cantons/' + MOCK_CANTON + '/municipalities/' + str(bfs_nr) + '/'
