@@ -6,8 +6,10 @@ Backend für den Workshop in der Vertiefung "Distributed Software Systems" (WODS
 
 ## Prerequisites
 
-- Miniconda
-- Python 3.8
+- [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+- Python 3.8 (z.B. direkt aus Miniconda)
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
 Es wird empfohlen, mit einem Conda Environment zu arbeiten.
 Folgender Befehl erstellt ein neues Conda Environment mit dem Namen `WODSS-Backend`:
