@@ -128,7 +128,9 @@ def test_incidences_without_datefrom_dateto_params(client, app, mock_canton_serv
 @pytest.mark.parametrize("canton", ["AGG", "GRR", "Basel", "A1"])
 def test_incidences_wrong_canton_format(client, app, canton):
     """
-    Check if falsely formatted canton returns 400 bad request with proper message
+    Check if falsely formatted canton returns 
+    - status code 400 bad request 
+    - error message describing wrong canton format
     """
     # Given
     url = application_root+'cantons/'+canton+'/incidences/'
@@ -147,7 +149,7 @@ def test_incidences_datefrom_bigger_than_dateTo(client, app, dateFrom, dateTo):
     """
     Check if we get a 400 status code if dateFrom is bigger than dateTo
     - 400 status code
-    - correct content-type
+    - error message explaining required semantic
     """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
@@ -163,6 +165,11 @@ def test_incidences_datefrom_bigger_than_dateTo(client, app, dateFrom, dateTo):
 
 @pytest.mark.parametrize("dateFrom, dateTo", [('28.02.2020', '2020-02-27'), ('20210214', '2021-02-13')])
 def test_incidences_datefrom_invalid_format(client, app, dateFrom, dateTo):
+    """
+    Check if invalid dateFrom format returns
+    - status code 400
+    - error message explaining required format
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
 
@@ -177,6 +184,11 @@ def test_incidences_datefrom_invalid_format(client, app, dateFrom, dateTo):
 
 @pytest.mark.parametrize("dateFrom, dateTo", [('2020-03-01', '27.03.2020'), ('2021-04-15', '20210513')])
 def test_incidences_dateto_invalid_format(client, app, dateFrom, dateTo):
+    """
+    Check if invalid dateTo format returns
+    - status code 400
+    - error message explaining required format
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
 
@@ -190,6 +202,12 @@ def test_incidences_dateto_invalid_format(client, app, dateFrom, dateTo):
 
 
 def test_incidences_unsupported_language(client, app, mock_canton_service, caplog):
+    """
+    Check if request with unsupported language returns
+    - still status code 200
+    - still expected json data
+    - made entry into log switching to default language
+    """
     # Given
     unsupported_language = 'fr-FR'
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?language=' + unsupported_language
@@ -199,6 +217,7 @@ def test_incidences_unsupported_language(client, app, mock_canton_service, caplo
     data = response.get_json()
 
     # Then
+    assert response.status_code == 200
     # Language param does nothing, but we can check the log!
     assert ('controllers.incidence_controller', logging.DEBUG, f'Invalid language (fr-FR), using default language instead ({default_language}).') in caplog.record_tuples
     assert len(data) == NUMBER_OF_MOCKED_INCIDENCES    
@@ -209,6 +228,11 @@ def test_incidences_unsupported_language(client, app, mock_canton_service, caplo
 
 
 def test_incidences_canton_service_timedout(client, app, mock_canton_service_timedout):
+    """
+    Check if timeout in canton service returns
+    - status code 408
+    - error message describing timeout in canton service
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
 
@@ -222,6 +246,11 @@ def test_incidences_canton_service_timedout(client, app, mock_canton_service_tim
 
 
 def test_incidences_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+    """
+    Check if request with unavailable canton returns
+    - status code 404
+    - message describe that no implementation for given canton is available
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
 
@@ -235,6 +264,11 @@ def test_incidences_canton_service_canton_unavailable(client, app, mock_canton_s
 
 
 def test_incidences_canton_service_error(client, app, mock_canton_service_error):
+    """
+    Check if error in canton service returns
+    - status code 502
+    - error message describing which canton service had an error
+    """
     # Given
     url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
 
@@ -273,6 +307,7 @@ def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_
     data = response.get_json()
 
     # Then
+    assert response.status_code == 200
     assert len(data) == NUMBER_OF_MOCKED_INCIDENCES_BFSNR    
     for i in range(0, NUMBER_OF_MOCKED_INCIDENCES_BFSNR):
         assert data[i]['bfsNr'] == bfs_nr
@@ -281,6 +316,12 @@ def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_
 
 
 def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_service, caplog):
+    """
+    Check if request with unsupported language returns
+    - still status code 200
+    - still expected json data
+    - made entry into log switching to default language
+    """
     # Given
     unsupported_language = 'fr-FR'
     bfs_nr = 3981
@@ -291,6 +332,7 @@ def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_ser
     data = response.get_json()
 
     # Then
+    assert response.status_code == 200
     # Language param does nothing, but we can check the log!
     assert ('controllers.incidence_controller', logging.DEBUG, f'Invalid language (fr-FR), using default language instead ({default_language}).') in caplog.record_tuples
     assert len(data) == NUMBER_OF_MOCKED_INCIDENCES_BFSNR    
@@ -301,6 +343,11 @@ def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_ser
 
 
 def test_incidences_for_bfs_nr_canton_service_timedout(client, app, mock_canton_service_timedout):
+    """
+    Check if timeout in canton service returns
+    - status code 408
+    - error message describing timeout in canton service
+    """
     # Given
     bfs_nr = 3561
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
@@ -315,6 +362,11 @@ def test_incidences_for_bfs_nr_canton_service_timedout(client, app, mock_canton_
 
 
 def test_incidences_for_bfs_nr_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+    """
+    Check if request with unavailable canton returns
+    - status code 404
+    - message describe that no implementation for given canton is available
+    """
     # Given
     bfs_nr = 3561
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
@@ -331,7 +383,9 @@ def test_incidences_for_bfs_nr_canton_service_canton_unavailable(client, app, mo
 @pytest.mark.parametrize("canton", ["AGG", "GRR", "Basel", "A1"])
 def test_incidences_for_bfs_nr_wrong_canton_format(client, app, canton):
     """
-    Check if falsely formatted canton returns 400 bad request with proper message
+    Check if falsely formatted canton returns 
+    - status code400 bad request
+    - error message describing wrong canton format
     """
     # Given
     bfs_nr = 3561
@@ -368,6 +422,11 @@ def test_incidences_for_bfs_nr_datefrom_bigger_than_dateTo(client, app, dateFrom
 
 @pytest.mark.parametrize("dateFrom, dateTo", [('28.02.2020', '2020-02-27'), ('20210214', '2021-02-13')])
 def test_incidences_for_bfs_nr_datefrom_invalid_format(client, app, dateFrom, dateTo):
+    """
+    Check if invalid dateFrom format returns
+    - status code 400
+    - error message explaining required format
+    """
     # Given
     bfs_nr = 3561
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
@@ -383,6 +442,11 @@ def test_incidences_for_bfs_nr_datefrom_invalid_format(client, app, dateFrom, da
 
 @pytest.mark.parametrize("dateFrom, dateTo", [('2020-03-01', '27.03.2020'), ('2021-04-15', '20210513')])
 def test_incidences_for_bfs_nr_dateto_invalid_format(client, app, dateFrom, dateTo):
+    """
+    Check if invalid dateTo format returns
+    - status code 400
+    - error message explaining required format
+    """
     # Given
     bfs_nr = 3561
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
@@ -397,6 +461,11 @@ def test_incidences_for_bfs_nr_dateto_invalid_format(client, app, dateFrom, date
 
 
 def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_service_error):
+    """
+    Check if error in canton service returns
+    - status code 502
+    - error message describing which canton service had an error
+    """
     # Given
     bfs_nr = 3561
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
@@ -411,6 +480,11 @@ def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_ser
 
 
 def test_incidences_for_bfs_nr_wrong_bfs_nr_format(client, app, mock_canton_service):
+    """
+    Check if wrong bfsNr format returns
+    - status code 400
+    - error message describing expected bfsNr format
+    """
     # Given
     bfs_nr = '3561-12'
     url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+bfs_nr+'/incidences/'
