@@ -61,7 +61,7 @@ class WaypointService:
                 retry_count = 0
 
                 # If there was no data for 'today' go back one or two days and try to load those
-                # If incidence_data was None, the canton is not available, do not retry
+                # If incidence_data was None, the canton is not available (or threw an error), do not retry
                 while retry_count < 3 and incidence_data == []:
                     retry_count += 1
                     logger.debug(
