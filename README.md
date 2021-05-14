@@ -60,9 +60,10 @@ docker-compose up -d
 ---
 
 ## Dev-Environment starten
+
 Nachdem die vorhergehenden Schritte ausgeführt wurden, kann auch der lokale Flask Server gestartet werden:
 
-``` CMD/ZSH
+```CMD/ZSH
 python server.py
 ```
 
@@ -121,6 +122,22 @@ open index.html
 
 Server wird gemäss Kantonsservice-[README.md](https://github.com/JanickHuerzeler/wodss-02-gr-canton-service#readme) bereits zur Verfügung gestellt.
 
+---
+
+Folgende Übersicht zeigt die wichtigsten URL und Pfade auf dem Live-Server
+
+#### **URLs** `api.corona-navigator.ch`
+
+#### **Deploy latest branch** `~/deploy_backend.sh`
+
+#### **Git Repo Path** `/opt/apps/wodss-02-gr-backend/`
+
+#### **Restart Backend-Service** `sudo systemctl restart wodss-02-gr-backend.service`
+
+#### **Conda Env Update** `conda env update --file /opt/apps/wodss-02-gr-backend/resources/environment.yml`
+
+---
+
 ### Docker Setup
 
 - Für die Docker Engine Installation kann folgender Anleitung gefolgt werden:
@@ -135,9 +152,9 @@ cd /opt/apps
 git clone https://github.com/JanickHuerzeler/wodss-02-gr-backend.git
 ```
 
-### Step 2 - Create Virtual Conda Environment
+### Step 2 - Virtual Conda Environment erstellen
 
-Because the virtual machine has insufficient memory, we first have to create a temporary 2GB swapfile
+Weil die bereitgestellte VM zu wenig Arbeitsspeicher hat, wird zuerst ein 2GB Swap-File erstellt
 
 ```ZSH / CMD
 sudo fallocate -l 2G /swapfile
@@ -148,7 +165,7 @@ Shorthander:
 sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
 ```
 
-Now we can create the conda env using environment.yml
+Nun kann die conda env mit Hilfe des environment.yml erstellt werden
 
 ```ZSH / CMD
 conda env create -f /opt/apps/wodss-02-gr-backend/resources/environment.yml
@@ -158,7 +175,8 @@ source activate WODSS-Backend
 
 ### Step 3 - Setup Nginx
 
-First we have to open ports 80+443 on SWITCHEngine: https://bit.ly/3fN5UD0
+Die Ports 80 und 443 müssen auf der VM offen sein. SWITCHEngine: https://bit.ly/3fN5UD0
+Danach einen vhost in nginx mit folgender Konfiguration erstellen:
 
 ```ZSH / CMD
 export DOMAIN=corona-navigator.ch
@@ -179,7 +197,7 @@ sudo ln -s /etc/nginx/sites-available/api.$DOMAIN /etc/nginx/sites-enabled/api.$
 sudo systemctl enable nginx
 ```
 
-### Step 4 - Setup backend as a system service
+### Step 4 - Setup backend als system service
 
 ```ZSH / CMD
 sudo tee /etc/systemd/system/wodss-02-gr-backend.service << EOF
@@ -187,7 +205,7 @@ sudo tee /etc/systemd/system/wodss-02-gr-backend.service << EOF
 Description=uWSGI instance to serve wodss-02-gr-backend
 
 [Service]
-ExecStart=/bin/bash -c 'cd /opt/apps/wodss-02-gr-backend && uwsgi -H /opt/anaconda/envs/WODSS-Backend resources/uwsgi.ini'
+ExecStart=/bin/bash -c 'cd /opt/apps/wodss-02-gr-backend && uwsgi --processes 4 --threads 2 -H /opt/anaconda/envs/WODSS-Backend resources/uwsgi.ini'
 
 [Install]
 WantedBy=multi-user.target
@@ -215,9 +233,11 @@ sudo snap set certbot trust-plugin-with-root=ok
 sudo certbot run -a manual -i nginx -d api.corona-navigator.ch
 ```
 
-### Create deploy script
+### Deploy Script erstellen
 
-First we have to open ports 20-21 + 4242-4243 on SWITCHEngine: https://bit.ly/3fN5UD0
+Mit Hilfe dieses Scripts können neue Versionen im Git Repo geholt und auf dem Server ausgerollt werden.
+
+Die Ports 20-21 und 4242-4243 müssen auf der VM offen sein. SWITCHEngine: https://bit.ly/3fN5UD0
 
 ```ZSH / CMD
 sudo tee /home/ubuntu/deploy_backend.sh <<EOF
