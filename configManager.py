@@ -20,6 +20,8 @@ class ConfigManager:
     __incidence_retry_days = None    
     __languages = None
     __no_incidence_color = None
+    __min_incidence_normalize_value = None
+    __max_incidence_normalize_value = None
 
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,6 +57,8 @@ class ConfigManager:
             self.__incidence_retry_days = config['incidence_retry_days']            
             self.__languages = config['languages']
             self.__no_incidence_color = config['no_incidence_color']
+            self.__min_incidence_normalize_value = config['min_incidence_normalize_value']
+            self.__max_incidence_normalize_value = config['max_incidence_normalize_value']
 
     def log_configfile_path(self):
         self.logger.info("ConfigFile-Path is: " + str(self.__config_file_path))
@@ -91,3 +95,9 @@ class ConfigManager:
     
     def get_no_incidence_color(self):
         return self.__no_incidence_color
+
+    def get_min_incidence_normalize_value(self):
+        return self.__min_incidence_normalize_value
+
+    def get_max_incidence_normalize_value(self):
+        return self.__max_incidence_normalize_value

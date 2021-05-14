@@ -127,5 +127,7 @@
   "geolocal_filepath": "plz_verzeichnis_v2.geojson",
   "incidence_retry_days": 3,  
   "languages": ["de-DE", "en-GB"],
-  "no_incidence_color": "#000000"
+  "no_incidence_color": "#000000",
+  "min_incidence_normalize_value": 0,
+  "max_incidence_normalize_value": 600
 }

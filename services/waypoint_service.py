@@ -17,7 +17,8 @@ df = ConfigManager.get_instance().get_required_date_format()
 incidence_retry_days: int = ConfigManager.get_instance().get_incidence_retry_days()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
 no_incidence_color: str = ConfigManager.get_instance().get_no_incidence_color()
-
+min_incidence_normalize_value = ConfigManager.get_instance().get_min_incidence_normalize_value()
+max_incidence_normalize_value = ConfigManager.get_instance().get_max_incidence_normalize_value()
 
 class WaypointService:
 
@@ -89,8 +90,8 @@ class WaypointService:
         # Color maps from: https://matplotlib.org/stable/tutorials/colors/colormaps.html#sequential
         color_map = pyplot.cm.get_cmap('RdYlGn_r')
 
-        # Normalize values from 0 to 750 into 0 to 1
-        norm = matplotlib.colors.Normalize(vmin=0, vmax=750)
+        # Normalize values from given min to given max (currently 0 and 600) into 0 to 1
+        norm = matplotlib.colors.Normalize(vmin=min_incidence_normalize_value, vmax=max_incidence_normalize_value)
 
         # Make gray when incidence is 0 or below or any other thing (should mark that it's missing)
         result['incidence_color'] = result['incidence'].apply(
