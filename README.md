@@ -51,7 +51,7 @@ Für das Caching von Inzidenzzahlen wird Redis verwendet. Der Redis-Server steht
 
 ### Prerequisites
 
-Docker Deamon muss installiert sein und laufen.
+Docker Daemon muss installiert sein und laufen.
 
 ```zsh / CMD
 docker-compose up -d
