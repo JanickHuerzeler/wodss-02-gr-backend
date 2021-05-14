@@ -22,7 +22,7 @@ class CantonService:
             f'CantonService.get_municipalities(canton) with canton={canton}')
 
         if not CantonService.__is_canton_available(canton):
-            return [], None
+            return [], 404
 
         try:
 
@@ -57,7 +57,7 @@ class CantonService:
             f'CantonService.get_municipalitiy(canton, bfs_nr) with canton={canton}, bfs_nr={bfs_nr}')
 
         if not CantonService.__is_canton_available(canton):
-            return {}, None
+            return {}, 404
 
         try:
             municipality = CantonService.__get_municipalities(canton, bfs_nr)
@@ -84,7 +84,7 @@ class CantonService:
             f'CantonService.get_incidences(canton, dateFrom, dateTo, bfs_nr=None) with canton={canton}, dateFrom={dateFrom}, dateTo={dateTo}, bfs_nr={bfs_nr}')
 
         if not CantonService.__is_canton_available(canton):
-            return None, None
+            return None, 404
 
         try:
             if bfs_nr is None:

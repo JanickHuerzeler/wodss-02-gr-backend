@@ -70,6 +70,8 @@ def get_municipalities_for_canton(canton):
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
+    elif status == 404:
+        return f'No canton found for "{canton}".', 404
 
     if not result:
         error_message = f'No municipalities found for canton "{canton}".'
@@ -140,6 +142,8 @@ def get_municipalitiy_for_canton(canton, bfsNr):
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
+    elif status == 404:
+        return f'No canton found for "{canton}".', 404
 
     if not result:
         error_message = f'No municipality found for canton "{canton}" and bfsNr "{bfsNr}".'

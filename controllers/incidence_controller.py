@@ -59,6 +59,8 @@ def get_incidences_for_canton(canton):
             description: Canton not found
         408:
             description: Canton or municipality servie timed out
+        502:
+            description: Canton service returned unsuccessful status code
     """
 
     # read query params
@@ -81,7 +83,7 @@ def get_incidences_for_canton(canton):
     if not ErrorHandlerService.check_date_format(date_to):
         return date_bad_request(f'Invalid format for parameter "dateTo" (required: {df})', None, None, date_to)
     if not ErrorHandlerService.check_date_semantic(date_from, date_to):
-        return date_bad_request('Invalid semantic in dates (required: dateFrom <= dateTo))', None, date_from, date_to)
+        return date_bad_request('Invalid semantic in dates (required: dateFrom <= dateTo)', None, date_from, date_to)
 
     # check language
     if not ErrorHandlerService.check_supported_language(language):
@@ -92,11 +94,15 @@ def get_incidences_for_canton(canton):
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
-
-    if result is None:
+    elif status == 404:
         error_message = f'No canton found for "{canton}".'
         logger.debug(error_message)
         return error_message, 404
+
+    if result is None:
+        error_message = f'Could not get data from canton service "{canton}".'
+        logger.debug(error_message)
+        return error_message, 502
 
     return jsonify(result)
 
@@ -149,6 +155,8 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
           description: Canton or bfsNr not found
         408:
             description: Canton or municipality servie timed out
+        502:
+            description: Canton service returned unsuccessful status code
     """
 
     # read query params
@@ -186,11 +194,13 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
+    elif status == 404:
+        return f'No canton found for "{canton}".', 404
 
     if result is None:
-        error_message = f'No municipality found for bfsNr {bfsNr}.'
+        error_message = f'Could not get data from canton service "{canton}".'
         logger.debug(error_message)
-        return error_message, 404
+        return error_message, 502
 
     return jsonify(result)
 
