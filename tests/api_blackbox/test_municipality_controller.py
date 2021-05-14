@@ -34,10 +34,18 @@ class MockCantonServiceResponse:
 
     @staticmethod
     def get_municipalities_unavailable_canton(canton):
-        return [], None
+        return [], 404
 
     @staticmethod
     def get_municipality_unavailable_canton(canton, bfs_nr):
+        return {}, 404
+
+    @staticmethod
+    def get_municipalities_canton_service_error(canton):
+        return [], None
+
+    @staticmethod
+    def get_municipality_canton_service_error(canton, bfs_nr):
         return {}, None
 
     @staticmethod
@@ -85,6 +93,17 @@ def mock_canton_service_timedout(monkeypatch):
     monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
 
 
+@pytest.fixture
+def mock_canton_service_error(monkeypatch):
+    def mock_get_municipalities(canton):
+        return MockCantonServiceResponse().get_municipalities_canton_service_error(canton)
+
+    def mock_get_municipality(canton, bfs_nr):
+        return MockCantonServiceResponse().get_municipality_canton_service_error(canton, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+
 """
 GET /cantons/<canton>/municipalities/
 """
@@ -121,7 +140,7 @@ def test_municipalities_unavailable_canton(client, app, mock_canton_service_unav
     # Then
     assert response.status_code == 404
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
-    assert bytes(f'No municipalities found for canton "{unavailable_canton}".', encoding='utf8') in response.get_data()
+    assert bytes(f'No canton found for "{unavailable_canton}".', encoding='utf8') in response.get_data()
 
 
 def test_municipalities_invalid_canton_format(client, app, mock_canton_service):
@@ -150,6 +169,18 @@ def test_municipalities_canton_service_timedout(client, app, mock_canton_service
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
+
+def test_municipalities_canton_service_error(client, app, mock_canton_service_error):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 404
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'No municipalities found for canton "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 def test_municipalities_wrong_language_still_works(client, app, mock_canton_service, caplog):
     # Given    
@@ -205,7 +236,7 @@ def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_canton_se
     # Then
     assert response.status_code == 404
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
-    assert bytes(f'No municipality found for canton "{unavailable_canton}" and bfsNr "{unavailable_bfs_nr}".', encoding='utf8') in response.get_data()
+    assert bytes(f'No canton found for "{unavailable_canton}".', encoding='utf8') in response.get_data()
 
 
 def test_municipality_invalid_canton_format(client, app, mock_canton_service):
@@ -235,6 +266,20 @@ def test_municipality_canton_service_timedout(client, app, mock_canton_service_t
     assert response.status_code == 408
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
+
+
+def test_municipaliy_canton_service_error(client, app, mock_canton_service_error):
+    # Given
+    bfs_nr = 3544  # Bergün Filisur
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + str(bfs_nr) + '/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 404
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'No municipality found for canton "{MOCK_CANTON}" and bfsNr "{bfs_nr}".', encoding='utf8') in response.get_data()
 
 
 def test_municipality_wrong_bfs_nr_format(client, app, mock_canton_service):
