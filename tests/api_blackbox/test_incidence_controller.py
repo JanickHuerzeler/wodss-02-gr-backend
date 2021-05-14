@@ -25,8 +25,7 @@ class MockCantonServiceResponse:
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         assert canton == 'GR'
-        incidences = json.load(open(f'{testdata_path}test_incidences_GR_20210420_20210430.json', 'r'))
-        print(len(incidences))
+        incidences = json.load(open(f'{testdata_path}test_incidences_GR_20210420_20210430.json', 'r'))        
 
         df_incidences = pd.DataFrame(incidences)
 
