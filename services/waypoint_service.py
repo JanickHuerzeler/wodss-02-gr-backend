@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 df = ConfigManager.get_instance().get_required_date_format()
 incidence_retry_days: int = ConfigManager.get_instance().get_incidence_retry_days()
 search_radius: int = ConfigManager.get_instance().get_geoservice_search_radius()
-use_local_geo_data: bool = ConfigManager.get_instance().get_use_local_geo_data()
 no_incidence_color: str = ConfigManager.get_instance().get_no_incidence_color()
 
 
@@ -28,20 +27,7 @@ class WaypointService:
         municipalities_geo_data = []
         timedout_cantons = set()
 
-        if use_local_geo_data:
-            logger.info(
-                'Use local geo data to retreive municipalities for coordinates')
-            municipalities_geo_data = GeoService.get_local_geodata(waypoints)
-        else:
-            # Loop all given waypoints and find municipalities for them
-            # One Waypoint can return multiple municipalities due to search_radius
-            logger.info(
-                'Use webservice geo data to retreive municipalities for coordinates')
-            for waypoint in waypoints:
-                result = GeoService.get_geodata(
-                    waypoint['lat'], waypoint['lng'], search_radius)
-                if result:
-                    municipalities_geo_data.extend(result)
+        municipalities_geo_data = GeoService.get_geodata(waypoints)
 
         df_municipalities_geo_data = pd.DataFrame.from_dict(
             municipalities_geo_data)

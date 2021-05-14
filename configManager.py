@@ -14,12 +14,10 @@ class ConfigManager:
     __redis_server_config = None
     __required_date_format = None
     __application_root = None
-    __cantonservice_urls = None
-    __geoservice_url = None
+    __cantonservice_urls = None    
     __geoservice_search_radius = None
     __geolocal_filepath = None
-    __incidence_retry_days = None
-    __use_local_geo_data = None
+    __incidence_retry_days = None    
     __languages = None
     __no_incidence_color = None
 
@@ -51,12 +49,10 @@ class ConfigManager:
             self.__redis_server_config = config['redis_server']
             self.__required_date_format = str(config['requiredDateFormat'])
             self.__application_root = config['application_root']
-            self.__cantonservice_urls = config['cantonservice_urls']
-            self.__geoservice_url = config['geoservice_url']
+            self.__cantonservice_urls = config['cantonservice_urls']            
             self.__geoservice_search_radius = config['geoservice_search_radius']
             self.__geolocal_filepath = config['geolocal_filepath']
-            self.__incidence_retry_days = config['incidence_retry_days']
-            self.__use_local_geo_data = config['use_local_geo_data']
+            self.__incidence_retry_days = config['incidence_retry_days']            
             self.__languages = config['languages']
             self.__no_incidence_color = config['no_incidence_color']
 
@@ -81,9 +77,6 @@ class ConfigManager:
     def get_cantonservice_urls(self):
         return self.__cantonservice_urls
 
-    def get_geoservice_url(self):
-        return self.__geoservice_url
-
     def get_geoservice_search_radius(self):
         return self.__geoservice_search_radius
 
@@ -92,9 +85,6 @@ class ConfigManager:
 
     def get_incidence_retry_days(self):
         return self.__incidence_retry_days
-
-    def get_use_local_geo_data(self):
-        return self.__use_local_geo_data
 
     def get_languages(self):
         return self.__languages

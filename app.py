@@ -39,12 +39,10 @@ requests_cache.install_cache(cache_name='cantonservice_cache', backend='redis',
 
 
 # Read local geojson data
-use_local_geo_data = ConfigManager.get_instance().get_use_local_geo_data()
 geolocal_filepath = ConfigManager.get_instance().get_geolocal_filepath()
-if use_local_geo_data:
-    with open(geolocal_filepath) as f:
-        logger.info(f'Loading geojson data from {geolocal_filepath}')
-        geo_features = json.load(f)["features"]
+with open(geolocal_filepath) as f:
+    logger.info(f'Loading geojson data from {geolocal_filepath}')
+    geo_features = json.load(f)["features"]
 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 

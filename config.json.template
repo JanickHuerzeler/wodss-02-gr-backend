@@ -122,13 +122,10 @@
       "url": "https://jagd.ddns.net/api",
       "ssl_ca_cert": ""
     }
-  },
-
-  "geoservice_url": "https://swisspost.opendatasoft.com/api/records/1.0/search/",
+  },  
   "geoservice_search_radius": 1000,
   "geolocal_filepath": "plz_verzeichnis_v2.geojson",
   "incidence_retry_days": 3,  
-  "use_local_geo_data": true,
   "languages": ["de-DE", "en-GB"],
   "no_incidence_color": "#000000"
 }
