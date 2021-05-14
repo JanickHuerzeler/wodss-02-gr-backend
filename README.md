@@ -120,6 +120,10 @@ open index.html
 
 ---
 
+## Cache Warm-Up
+
+Das Caching von Inzidenzzahlen kann mit `python cache_warmup.py` aufgewärmt werden. Wird dieses Script ausgeführt, werden alle Kantone, für welche ein Server konfiguriert ist aus dem `config.json` gelesen. Bei diesem Kantonen werden alle BFS-Nr. anegefragt und schliesslich für diese BFS-Nr die Requests gesendet. Mit dem Senden der Requests wird der Cache augewärmt.
+
 ## Live Environment
 
 Server wird gemäss Kantonsservice-[README.md](https://github.com/JanickHuerzeler/wodss-02-gr-canton-service#readme) bereits zur Verfügung gestellt.
@@ -175,7 +179,14 @@ conda env create -f /opt/apps/wodss-02-gr-backend/resources/environment.yml
 source activate WODSS-Backend
 ```
 
-### Step 3 - Setup Nginx
+### Step 3 - Setup cronjob (requests-cache warm-up)
+
+```ZSH / CMD
+crontab -e
+50 */3 * * * cd /opt/apps/wodss-02-gr-backend && /opt/anaconda/envs/WODSS-Backend/bin/python3.8 cache_warmup.py
+```
+
+### Step 4 - Setup Nginx
 
 Die Ports 80 und 443 müssen auf der VM offen sein. SWITCHEngine: https://bit.ly/3fN5UD0
 Danach einen vhost in nginx mit folgender Konfiguration erstellen:
@@ -199,7 +210,7 @@ sudo ln -s /etc/nginx/sites-available/api.$DOMAIN /etc/nginx/sites-enabled/api.$
 sudo systemctl enable nginx
 ```
 
-### Step 4 - Setup backend als system service
+### Step 5 - Setup backend als system service
 
 ```ZSH / CMD
 sudo tee /etc/systemd/system/wodss-02-gr-backend.service << EOF
@@ -216,7 +227,7 @@ EOF
 sudo systemctl enable wodss-02-gr-backend
 ```
 
-### Step 5 - Setup SSL
+### Step 6 - Setup SSL
 
 ```ZSH / CMD
 # Ensure that the version of snapd is up to date
