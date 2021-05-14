@@ -48,6 +48,19 @@ class MockCantonServiceResponse:
 
         return df_incidences.to_dict('records'), None
 
+    @staticmethod
+    def get_incidences_timedout(canton, dateFrom, dateTo, bfs_nr=None):
+        return None, 408
+
+
+    @staticmethod
+    def get_incidences_canton_unavailable(canton, dateFrom, dateTo, bfs_nr=None):
+        return None, 404
+
+    @staticmethod
+    def get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr=None):
+        return None, None
+
 
 @pytest.fixture
 def mock_canton_service(monkeypatch):
@@ -56,6 +69,29 @@ def mock_canton_service(monkeypatch):
 
     monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)    
 
+
+@pytest.fixture
+def mock_canton_service_timedout(monkeypatch):
+    def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        return MockCantonServiceResponse().get_incidences_timedout(canton, dateFrom, dateTo, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+
+
+@pytest.fixture
+def mock_canton_service_canton_unavailable(monkeypatch):
+    def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        return MockCantonServiceResponse().get_incidences_canton_unavailable(canton, dateFrom, dateTo, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+
+
+@pytest.fixture
+def mock_canton_service_error(monkeypatch):
+    def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        return MockCantonServiceResponse().get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
 
 """
 GET '/cantons/<canton>/incidences/'
@@ -89,6 +125,128 @@ def test_incidences_without_datefrom_dateto_params(client, app, mock_canton_serv
         assert data[i]['incidence'] is not None
 
 
+@pytest.mark.parametrize("canton", ["AGG", "GRR", "Basel", "A1"])
+def test_incidences_wrong_canton_format(client, app, canton):
+    """
+    Check if falsely formatted canton returns 400 bad request with proper message
+    """
+    # Given
+    url = application_root+'cantons/'+canton+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert b'Invalid format for parameter "canton" (required: 2 chars)' in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('2020-02-28', '2020-02-27'), ('2021-02-14', '2021-02-13')])
+def test_incidences_datefrom_bigger_than_dateTo(client, app, dateFrom, dateTo):
+    """
+    Check if we get a 400 status code if dateFrom is bigger than dateTo
+    - 400 status code
+    - correct content-type
+    """
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert b'Invalid semantic in dates (required: dateFrom <= dateTo)' in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('28.02.2020', '2020-02-27'), ('20210214', '2021-02-13')])
+def test_incidences_datefrom_invalid_format(client, app, dateFrom, dateTo):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Invalid format for parameter "dateFrom" (required: {df})', encoding='UTF-8') in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('2020-03-01', '27.03.2020'), ('2021-04-15', '20210513')])
+def test_incidences_dateto_invalid_format(client, app, dateFrom, dateTo):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Invalid format for parameter "dateTo" (required: {df})', encoding='UTF-8') in response.get_data()
+
+
+def test_incidences_unsupported_language(client, app, mock_canton_service, caplog):
+    # Given
+    unsupported_language = 'fr-FR'
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/?language=' + unsupported_language
+
+    # When
+    response = client.get(url)
+    data = response.get_json()
+
+    # Then
+    # Language param does nothing, but we can check the log!
+    assert ('controllers.incidence_controller', logging.DEBUG, f'Invalid language (fr-FR), using default language instead ({default_language}).') in caplog.record_tuples
+    assert len(data) == NUMBER_OF_MOCKED_INCIDENCES    
+    for i in range(0, NUMBER_OF_MOCKED_INCIDENCES):
+        assert data[i]['bfsNr'] is not None
+        assert data[i]['date'] is not None
+        assert data[i]['incidence'] is not None
+
+
+def test_incidences_canton_service_timedout(client, app, mock_canton_service_timedout):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 408
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
+
+
+def test_incidences_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 404
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'No canton found for "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_incidences_canton_service_error(client, app, mock_canton_service_error):
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
 """
 GET /cantons/<canton>/municipalities/<bfsNr>/incidences/
 """
@@ -120,3 +278,147 @@ def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_
         assert data[i]['bfsNr'] == bfs_nr
         assert data[i]['date'] is not None
         assert data[i]['incidence'] is not None
+
+
+def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_service, caplog):
+    # Given
+    unsupported_language = 'fr-FR'
+    bfs_nr = 3981
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?language=' + unsupported_language
+
+    # When
+    response = client.get(url)
+    data = response.get_json()
+
+    # Then
+    # Language param does nothing, but we can check the log!
+    assert ('controllers.incidence_controller', logging.DEBUG, f'Invalid language (fr-FR), using default language instead ({default_language}).') in caplog.record_tuples
+    assert len(data) == NUMBER_OF_MOCKED_INCIDENCES_BFSNR    
+    for i in range(0, NUMBER_OF_MOCKED_INCIDENCES_BFSNR):
+        assert data[i]['bfsNr'] == bfs_nr
+        assert data[i]['date'] is not None
+        assert data[i]['incidence'] is not None
+
+
+def test_incidences_for_bfs_nr_canton_service_timedout(client, app, mock_canton_service_timedout):
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 408
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
+
+
+def test_incidences_for_bfs_nr_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 404
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'No canton found for "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+@pytest.mark.parametrize("canton", ["AGG", "GRR", "Basel", "A1"])
+def test_incidences_for_bfs_nr_wrong_canton_format(client, app, canton):
+    """
+    Check if falsely formatted canton returns 400 bad request with proper message
+    """
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+canton+'/municipalities/'+str(bfs_nr)+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert b'Invalid format for parameter "canton" (required: 2 chars)' in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('2020-02-28', '2020-02-27'), ('2021-02-14', '2021-02-13')])
+def test_incidences_for_bfs_nr_datefrom_bigger_than_dateTo(client, app, dateFrom, dateTo):
+    """
+    Check if we get a 400 status code if dateFrom is bigger than dateTo
+    - 400 status code
+    - correct content-type
+    """
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert b'Invalid semantic in dates (required: dateFrom <= dateTo)' in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('28.02.2020', '2020-02-27'), ('20210214', '2021-02-13')])
+def test_incidences_for_bfs_nr_datefrom_invalid_format(client, app, dateFrom, dateTo):
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Invalid format for parameter "dateFrom" (required: {df})', encoding='UTF-8') in response.get_data()
+
+
+@pytest.mark.parametrize("dateFrom, dateTo", [('2020-03-01', '27.03.2020'), ('2021-04-15', '20210513')])
+def test_incidences_for_bfs_nr_dateto_invalid_format(client, app, dateFrom, dateTo):
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/?dateFrom='+dateFrom+'&dateTo='+dateTo
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Invalid format for parameter "dateTo" (required: {df})', encoding='UTF-8') in response.get_data()
+
+
+def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_service_error):
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_incidences_for_bfs_nr_wrong_bfs_nr_format(client, app, mock_canton_service):
+    # Given
+    bfs_nr = '3561-12'
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+bfs_nr+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 400
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes('Invalid format for parameter "bfsNr" (required: 4-digit number)', encoding='utf8') in response.get_data()
