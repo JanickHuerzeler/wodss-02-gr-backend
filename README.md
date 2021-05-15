@@ -122,7 +122,7 @@ open index.html
 
 ## Cache Warm-Up
 
-Das Caching von Inzidenzzahlen kann mit `python cache_warmup.py` aufgewärmt werden. Wird dieses Script ausgeführt, werden alle Kantone, für welche ein Server konfiguriert ist aus dem `config.json` gelesen. Bei diesem Kantonen werden alle BFS-Nr. anegefragt und schliesslich für diese BFS-Nr die Requests gesendet. Mit dem Senden der Requests wird der Cache augewärmt.
+Das Caching von Inzidenzzahlen kann mit `python cache_warmup.py` aufgewärmt werden. Wird dieses Script ausgeführt, werden alle Kantone, für welche ein Server konfiguriert ist aus dem `config.json` gelesen. Bei diesen Kantonen werden alle BFS-Nr. angefragt und schliesslich für diese BFS-Nr die Requests gesendet. Mit dem Senden der Requests wird der Cache augewärmt.
 
 ## Live Environment
 
