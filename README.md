@@ -124,6 +124,8 @@ open index.html
 
 Das Caching von Inzidenzzahlen kann mit `python cache_warmup.py` aufgewärmt werden. Wird dieses Script ausgeführt, werden alle Kantone, für welche ein Server konfiguriert ist aus dem `config.json` gelesen. Bei diesen Kantonen werden alle BFS-Nr. angefragt und schliesslich für diese BFS-Nr die Requests gesendet. Mit dem Senden der Requests wird der Cache augewärmt.
 
+---
+
 ## Live Environment
 
 Server wird gemäss Kantonsservice-[README.md](https://github.com/JanickHuerzeler/wodss-02-gr-canton-service#readme) bereits zur Verfügung gestellt.
