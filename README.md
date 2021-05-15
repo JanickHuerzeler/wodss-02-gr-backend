@@ -4,7 +4,7 @@ Backend für den Workshop in der Vertiefung "Distributed Software Systems" (WODS
 
 ---
 
-## Prerequisites
+## Voraussetzungen
 
 - [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 - Python 3.8 (z.B. direkt aus Miniconda)
@@ -59,6 +59,13 @@ Docker Daemon muss installiert sein und laufen.
 docker-compose up -d
 ```
 
+```zsh / CMD
+Error:  Ports are not available: listen tcp 0.0.0.0:6379
+
+net stop winnat
+docker start ...
+net start winnat
+```
 ---
 
 ## Dev-Environment starten
