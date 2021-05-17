@@ -33,7 +33,7 @@ class CantonService:
 
             result = [Municipality(**m).as_dict for m in municipalities]
 
-            return result, None
+            return result, 200
         except requests.exceptions.Timeout as errh:
             logger.warning(
                 'Timeout when calling CantonService.__get_municipalities or processing its response')
@@ -45,7 +45,7 @@ class CantonService:
                 logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
-            return None, None
+            return None, errh.response.status_code
         except requests.exceptions.RequestException:
             logger.exception(
                 'Exception when calling CantonService.__get_municipalities or processing its response.')
@@ -61,7 +61,7 @@ class CantonService:
 
         try:
             municipality = CantonService.__get_municipalities(canton, bfs_nr)
-            return Municipality(**municipality).as_dict, None
+            return Municipality(**municipality).as_dict, 200
         except requests.exceptions.Timeout as errh:
             logger.warning(
                 'Timeout when calling CantonService.__get_municipalities or processing its response')
@@ -72,7 +72,7 @@ class CantonService:
                 logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
-            return None, None
+            return None, errh.response.status_code
         except requests.exceptions.RequestException:
             logger.exception(
                 'Exception when calling CantonService.__get_municipalities or processing its response.')
@@ -101,7 +101,7 @@ class CantonService:
             for i in incidences:
                 result.append(Incidence(**i).as_dict)
 
-            return result, None
+            return result, 200
         except requests.exceptions.Timeout as errh:
             logger.warning(
                 'Timeout when calling CantonService.__get_incidences or processing its response')
@@ -112,7 +112,7 @@ class CantonService:
                 logger.warning(log_msg)
             else:
                 logger.exception(log_msg)
-            return None, None
+            return None, errh.response.status_code
         except requests.exceptions.RequestException:
             logger.exception(
                 'Exception when calling CantonService.__get_incidences or processing its response')

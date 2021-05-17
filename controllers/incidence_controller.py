@@ -99,8 +99,8 @@ def get_incidences_for_canton(canton):
         logger.debug(error_message)
         return error_message, 404
 
-    if result is None:
-        error_message = f'Could not get data from canton service "{canton}".'
+    if result is None or status is None or status != 200:
+        error_message = f'Could not get data from canton service "{canton}"{" (status "+str(status)+")" if status is not None else ""}.'
         logger.debug(error_message)
         return error_message, 502
 
@@ -197,8 +197,8 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
     elif status == 404:
         return f'No canton found for "{canton}".', 404
 
-    if result is None:
-        error_message = f'Could not get data from canton service "{canton}".'
+    if result is None or status is None or status != 200:
+        error_message = f'Could not get data from canton service "{canton}"{" (status "+str(status)+")" if status is not None else ""}.'
         logger.debug(error_message)
         return error_message, 502
 

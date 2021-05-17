@@ -20,7 +20,7 @@ class MockCantonServiceResponse:
         # Mocking only (parts of) canton GR
         assert canton == MOCK_CANTON
         return [{"area": 42.51, "bfsNr": 3506, "canton": "GR", "name": "Vaz/Obervaz", "population": 2780},
-                {"area": 190.14, "bfsNr": 3544, "canton": "GR", "name": "Berg\u00fcn Filisur", "population": 905}], None
+                {"area": 190.14, "bfsNr": 3544, "canton": "GR", "name": "Berg\u00fcn Filisur", "population": 905}], 200
 
     @staticmethod
     def get_municipality(canton, bfs_nr) -> object:
@@ -29,7 +29,7 @@ class MockCantonServiceResponse:
             3544: {"area": 190.14, "bfsNr": 3544, "canton": "GR", "name": "Berg\u00fcn Filisur", "population": 905}
         }
 
-        return switcher.get(int(bfs_nr), []), None
+        return switcher.get(int(bfs_nr), []), 200
 
 
     @staticmethod
@@ -49,6 +49,14 @@ class MockCantonServiceResponse:
         return None, None
 
     @staticmethod
+    def get_municipalities_canton_service_500_error(canton):
+        return None, 500
+
+    @staticmethod
+    def get_municipality_canton_service_500_error(canton, bfs_nr):
+        return None, 500
+
+    @staticmethod
     def get_municipalities_timedout(canton):
         return None, 408
 
@@ -58,11 +66,11 @@ class MockCantonServiceResponse:
 
     @staticmethod
     def get_municipalities_no_data(canton):
-        return [], None
+        return [], 200
 
     @staticmethod
     def get_municipality_no_data(canton, bfs_nr):
-        return {}, None
+        return {}, 200
 
 
 @pytest.fixture
@@ -108,6 +116,18 @@ def mock_canton_service_error(monkeypatch):
 
     def mock_get_municipality(canton, bfs_nr):
         return MockCantonServiceResponse().get_municipality_canton_service_error(canton, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+
+
+@pytest.fixture
+def mock_canton_service_500_error(monkeypatch):
+    def mock_get_municipalities(canton):
+        return MockCantonServiceResponse().get_municipalities_canton_service_500_error(canton)
+
+    def mock_get_municipality(canton, bfs_nr):
+        return MockCantonServiceResponse().get_municipality_canton_service_500_error(canton, bfs_nr)
 
     monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
     monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
@@ -223,6 +243,24 @@ def test_municipalities_canton_service_error(client, app, mock_canton_service_er
     assert response.status_code == 502
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_municipalities_canton_service_500_error(client, app, mock_canton_service_500_error):
+    """
+    Check if error in canton service returns
+    - status code  502
+    - error message describing canton service that had the error including its status code
+    """
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" (status 500).', encoding='utf8') in response.get_data()
 
 
 def test_municipalities_canton_no_data(client, app, mock_canton_service_no_data):
@@ -367,6 +405,25 @@ def test_municipality_canton_service_error(client, app, mock_canton_service_erro
     assert response.status_code == 502
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" for bfsNr "{bfs_nr}".', encoding='utf8') in response.get_data()
+
+
+def test_municipality_canton_service_500_error(client, app, mock_canton_service_500_error):
+    """
+    Check if error in canton service returns
+    - status code  502
+    - error message describing canton service that had the error including its status code
+    """
+    # Given
+    bfs_nr = 3544  # Bergün Filisur
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/' + str(bfs_nr) + '/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" for bfsNr "{bfs_nr}" (status 500).', encoding='utf8') in response.get_data()
 
 
 def test_municipality_canton_service_no_data(client, app, mock_canton_service_no_data):

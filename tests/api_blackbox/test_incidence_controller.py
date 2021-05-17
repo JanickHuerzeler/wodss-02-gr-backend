@@ -45,7 +45,7 @@ class MockCantonServiceResponse:
 
         df_incidences.drop(columns=['real_date'], inplace=True)
 
-        return df_incidences.to_dict('records'), None
+        return df_incidences.to_dict('records'), 200
 
     @staticmethod
     def get_incidences_timedout(canton, dateFrom, dateTo, bfs_nr=None):
@@ -56,9 +56,15 @@ class MockCantonServiceResponse:
     def get_incidences_canton_unavailable(canton, dateFrom, dateTo, bfs_nr=None):
         return None, 404
 
+
     @staticmethod
     def get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr=None):
         return None, None
+
+
+    @staticmethod
+    def get_incidences_canton_service_500_error(canton, dateFrom, dateTo, bfs_nr=None):
+        return None, 500
 
 
 @pytest.fixture
@@ -91,6 +97,15 @@ def mock_canton_service_error(monkeypatch):
         return MockCantonServiceResponse().get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr)
 
     monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+
+
+@pytest.fixture
+def mock_canton_service_500_error(monkeypatch):
+    def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
+        return MockCantonServiceResponse().get_incidences_canton_service_500_error(canton, dateFrom, dateTo, bfs_nr)
+
+    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+
 
 """
 GET '/cantons/<canton>/incidences/'
@@ -278,6 +293,25 @@ def test_incidences_canton_service_error(client, app, mock_canton_service_error)
     assert response.status_code == 502
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_incidences_canton_service_500_error(client, app, mock_canton_service_500_error):
+    """
+    Check if error in canton service returns
+    - status code 502
+    - error message describing which canton service had an error including its status code
+    """
+    # Given
+    url = application_root+'cantons/'+MOCK_CANTON+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" (status 500).', encoding='utf8') in response.get_data()
+
 
 
 """
@@ -476,6 +510,25 @@ def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_ser
     assert response.status_code == 502
     assert response.headers["Content-Type"] == "text/html; charset=utf-8"
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
+
+
+def test_incidences_for_bfs_nr_canton_service_500_error(client, app, mock_canton_service_500_error):
+    """
+    Check if error in canton service returns
+    - status code 502
+    - error message describing which canton service had an error including its status code
+    """
+    # Given
+    bfs_nr = 3561
+    url = application_root+'cantons/'+MOCK_CANTON+'/municipalities/'+str(bfs_nr)+'/incidences/'
+
+    # When
+    response = client.get(url)
+
+    # Then
+    assert response.status_code == 502
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" (status 500).', encoding='utf8') in response.get_data()
 
 
 def test_incidences_for_bfs_nr_wrong_bfs_nr_format(client, app, mock_canton_service):
