@@ -12,7 +12,7 @@ class ErrorHandlerService:
     # check if canton contains only two chars
     @staticmethod
     def check_canton_format(canton):
-        return True if re.fullmatch(r'[a-zA-Z]{2}', canton) else False
+        return True if re.fullmatch(r'^[a-zA-Z]{2}$', canton) else False
 
     # check if date is in the correct format (yyyy-MM-dd)
     @staticmethod

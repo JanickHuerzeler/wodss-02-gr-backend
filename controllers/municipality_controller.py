@@ -68,7 +68,7 @@ def get_municipalities_for_canton(canton):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_municipalities(canton)
+    result, status = CantonService.get_municipalities(canton.upper())
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
@@ -146,7 +146,7 @@ def get_municipalitiy_for_canton(canton, bfsNr):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_municipality(canton, bfsNr)
+    result, status = CantonService.get_municipality(canton.upper(), bfsNr)
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
