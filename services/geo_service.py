@@ -1,8 +1,5 @@
 from rtree import index
-import json
-from shapely.geometry import shape, GeometryCollection, Point
-import requests
-from configManager import ConfigManager
+from shapely.geometry import shape, Point
 import logging
 from app import geo_features
 

@@ -1,15 +1,12 @@
-import requests
-from datetime import datetime, timedelta
+from datetime import timedelta
 from configManager import ConfigManager
 import logging
 from services.geo_service import GeoService
 from services.canton_service import CantonService
 import pandas as pd
-import json
 import math
 import matplotlib
 import matplotlib.pyplot as pyplot
-from shapely.geometry import shape, GeometryCollection, Point
 
 
 logger = logging.getLogger(__name__)

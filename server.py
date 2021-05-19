@@ -6,7 +6,7 @@ from controllers.waypoint_controller import waypoint_controller
 from controllers.incidence_controller import incidence_controller
 from controllers.municipality_controller import municipality_controller
 
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 
 import logging
 from werkzeug.exceptions import InternalServerError, NotFound

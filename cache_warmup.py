@@ -1,6 +1,6 @@
 from configManager import ConfigManager
 from services.canton_service import CantonService
-from datetime import date, timedelta
+from datetime import timedelta
 from app import requests_cache
 
 # Clear the cache before warmup

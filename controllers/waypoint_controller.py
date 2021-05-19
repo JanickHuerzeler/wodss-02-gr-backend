@@ -1,17 +1,10 @@
 from flask import jsonify, request, Blueprint
-from datetime import datetime
 from configManager import ConfigManager
-from werkzeug.exceptions import InternalServerError
 from app import app
 import logging
 from flask_cors import cross_origin
 from services.waypoint_service import WaypointService
-from services.geo_service import GeoService
-from services.canton_service import CantonService
 from services.errorhandler_service import ErrorHandlerService
-import pandas as pd
-import matplotlib
-import matplotlib.pyplot as pyplot
 from flask import make_response
 
 logger = logging.getLogger(__name__)

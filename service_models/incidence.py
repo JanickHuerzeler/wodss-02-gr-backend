@@ -1,6 +1,3 @@
-from configManager import ConfigManager
-
-
 class Incidence(object):
 
     def __init__(self, bfsNr=None, date=None, incidence=None, *args, **kwargs):

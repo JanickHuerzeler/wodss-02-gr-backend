@@ -1,7 +1,6 @@
 from flask import jsonify, request, Blueprint
 from datetime import datetime
 from configManager import ConfigManager
-from werkzeug.exceptions import InternalServerError
 from app import app
 import logging
 from services.canton_service import CantonService
