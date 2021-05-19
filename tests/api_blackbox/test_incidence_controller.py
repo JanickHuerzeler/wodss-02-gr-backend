@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 import pytest
 from configManager import ConfigManager
-from services.canton_service import CantonService
+from services.incidence_service import IncidenceService
 
 application_root = ConfigManager.get_instance().get_application_root()
 # Enforce trailing slash
@@ -21,7 +21,7 @@ NUMBER_OF_MOCKED_INCIDENCES_BFSNR = 11
 default_language = 'de-DE'
 
 
-class MockCantonServiceResponse:
+class MockIncidenceServiceResponse:
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         assert canton == 'GR'
@@ -58,53 +58,53 @@ class MockCantonServiceResponse:
 
 
     @staticmethod
-    def get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr=None):
+    def get_incidences_incidence_service_error(canton, dateFrom, dateTo, bfs_nr=None):
         return None, None
 
 
     @staticmethod
-    def get_incidences_canton_service_500_error(canton, dateFrom, dateTo, bfs_nr=None):
+    def get_incidences_incidence_service_500_error(canton, dateFrom, dateTo, bfs_nr=None):
         return None, 500
 
 
 @pytest.fixture
-def mock_canton_service(monkeypatch):
+def mock_incidence_service(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences(canton, dateFrom, dateTo, bfs_nr)
+        return MockIncidenceServiceResponse().get_incidences(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)    
+    monkeypatch.setattr(IncidenceService, 'get_incidences', mock_get_incidences)    
 
 
 @pytest.fixture
-def mock_canton_service_timedout(monkeypatch):
+def mock_incidence_service_timedout(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_timedout(canton, dateFrom, dateTo, bfs_nr)
+        return MockIncidenceServiceResponse().get_incidences_timedout(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(IncidenceService, 'get_incidences', mock_get_incidences)
 
 
 @pytest.fixture
-def mock_canton_service_canton_unavailable(monkeypatch):
+def mock_incidence_service_canton_unavailable(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_canton_unavailable(canton, dateFrom, dateTo, bfs_nr)
+        return MockIncidenceServiceResponse().get_incidences_canton_unavailable(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(IncidenceService, 'get_incidences', mock_get_incidences)
 
 
 @pytest.fixture
-def mock_canton_service_error(monkeypatch):
+def mock_incidence_service_error(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_canton_service_error(canton, dateFrom, dateTo, bfs_nr)
+        return MockIncidenceServiceResponse().get_incidences_incidence_service_error(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(IncidenceService, 'get_incidences', mock_get_incidences)
 
 
 @pytest.fixture
-def mock_canton_service_500_error(monkeypatch):
+def mock_incidence_service_500_error(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_canton_service_500_error(canton, dateFrom, dateTo, bfs_nr)
+        return MockIncidenceServiceResponse().get_incidences_incidence_service_500_error(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(IncidenceService, 'get_incidences', mock_get_incidences)
 
 
 """
@@ -112,7 +112,7 @@ GET '/cantons/<canton>/incidences/'
 """
 
 
-def test_incidences_without_datefrom_dateto_params(client, app, mock_canton_service):
+def test_incidences_without_datefrom_dateto_params(client, app, mock_incidence_service):
     """
     Check if cantons/<canton>/incidences/ returns 
     - a list of all mocked incidences
@@ -215,7 +215,7 @@ def test_incidences_dateto_invalid_format(client, app, dateFrom, dateTo):
     assert bytes(f'Invalid format for parameter "dateTo" (required: {df})', encoding='UTF-8') in response.get_data()
 
 
-def test_incidences_unsupported_language(client, app, mock_canton_service, caplog):
+def test_incidences_unsupported_language(client, app, mock_incidence_service, caplog):
     """
     Check if request with unsupported language returns
     - still status code 200
@@ -241,7 +241,7 @@ def test_incidences_unsupported_language(client, app, mock_canton_service, caplo
         assert data[i]['incidence'] is not None
 
 
-def test_incidences_canton_service_timedout(client, app, mock_canton_service_timedout):
+def test_incidences_incidence_service_timedout(client, app, mock_incidence_service_timedout):
     """
     Check if timeout in canton service returns
     - status code 408
@@ -259,7 +259,7 @@ def test_incidences_canton_service_timedout(client, app, mock_canton_service_tim
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
 
-def test_incidences_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+def test_incidences_incidence_service_canton_unavailable(client, app, mock_incidence_service_canton_unavailable):
     """
     Check if request with unavailable canton returns
     - status code 404
@@ -277,7 +277,7 @@ def test_incidences_canton_service_canton_unavailable(client, app, mock_canton_s
     assert bytes(f'No canton found for "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 
-def test_incidences_canton_service_error(client, app, mock_canton_service_error):
+def test_incidences_incidence_service_error(client, app, mock_incidence_service_error):
     """
     Check if error in canton service returns
     - status code 502
@@ -295,7 +295,7 @@ def test_incidences_canton_service_error(client, app, mock_canton_service_error)
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 
-def test_incidences_canton_service_500_error(client, app, mock_canton_service_500_error):
+def test_incidences_incidence_service_500_error(client, app, mock_incidence_service_500_error):
     """
     Check if error in canton service returns
     - status code 502
@@ -319,7 +319,7 @@ GET /cantons/<canton>/municipalities/<bfsNr>/incidences/
 """
 
 
-def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_canton_service):
+def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_incidence_service):
     """
     Check if /cantons/<canton>/municipalities/<bfsNr>/incidences/ returns 
     - a list of all mocked incidences of the given bfsNr
@@ -348,7 +348,7 @@ def test_incidences_for_bfs_nr_without_datefrom_dateto_params(client, app, mock_
         assert data[i]['incidence'] is not None
 
 
-def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_service, caplog):
+def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_incidence_service, caplog):
     """
     Check if request with unsupported language returns
     - still status code 200
@@ -375,7 +375,7 @@ def test_incidences_for_bfs_nr_unsupported_language(client, app, mock_canton_ser
         assert data[i]['incidence'] is not None
 
 
-def test_incidences_for_bfs_nr_canton_service_timedout(client, app, mock_canton_service_timedout):
+def test_incidences_for_bfs_nr_incidence_service_timedout(client, app, mock_incidence_service_timedout):
     """
     Check if timeout in canton service returns
     - status code 408
@@ -394,7 +394,7 @@ def test_incidences_for_bfs_nr_canton_service_timedout(client, app, mock_canton_
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
 
-def test_incidences_for_bfs_nr_canton_service_canton_unavailable(client, app, mock_canton_service_canton_unavailable):
+def test_incidences_for_bfs_nr_incidence_service_canton_unavailable(client, app, mock_incidence_service_canton_unavailable):
     """
     Check if request with unavailable canton returns
     - status code 404
@@ -493,7 +493,7 @@ def test_incidences_for_bfs_nr_dateto_invalid_format(client, app, dateFrom, date
     assert bytes(f'Invalid format for parameter "dateTo" (required: {df})', encoding='UTF-8') in response.get_data()
 
 
-def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_service_error):
+def test_incidences_for_bfs_nr_incidence_service_error(client, app, mock_incidence_service_error):
     """
     Check if error in canton service returns
     - status code 502
@@ -512,7 +512,7 @@ def test_incidences_for_bfs_nr_canton_service_error(client, app, mock_canton_ser
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 
-def test_incidences_for_bfs_nr_canton_service_500_error(client, app, mock_canton_service_500_error):
+def test_incidences_for_bfs_nr_incidence_service_500_error(client, app, mock_incidence_service_500_error):
     """
     Check if error in canton service returns
     - status code 502
@@ -531,7 +531,7 @@ def test_incidences_for_bfs_nr_canton_service_500_error(client, app, mock_canton
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" (status 500).', encoding='utf8') in response.get_data()
 
 
-def test_incidences_for_bfs_nr_wrong_bfs_nr_format(client, app, mock_canton_service):
+def test_incidences_for_bfs_nr_wrong_bfs_nr_format(client, app, mock_incidence_service):
     """
     Check if wrong bfsNr format returns
     - status code 400

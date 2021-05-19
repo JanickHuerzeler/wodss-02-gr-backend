@@ -3,14 +3,15 @@ import pickle
 import pytest
 from configManager import ConfigManager
 from services.waypoint_service import WaypointService
-from services.canton_service import CantonService
+from data_access.canton_data_access import CantonDataAccess
+
 
 testdata_path = 'tests/services/testdata/'
 
 df = ConfigManager.get_instance().get_required_date_format()
 
 
-class MockCantonServiceResponse:
+class MockCantonDataAccessResponse:
     @staticmethod
     def get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         # Mocking only canton GR
@@ -56,75 +57,75 @@ class MockCantonServiceResponse:
 
 
 @pytest.fixture
-def mock_canton_service(monkeypatch):
+def mock_canton_data_access(monkeypatch):
     pytest.mock_get_incidences_count = 0
 
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
         pytest.mock_get_incidences_count += 1
-        return MockCantonServiceResponse().get_incidences(canton, dateFrom, dateTo, bfs_nr)
+        return MockCantonDataAccessResponse().get_incidences(canton, dateFrom, dateTo, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(CantonDataAccess, 'get_incidences', mock_get_incidences)
 
 @pytest.fixture
-def mock_canton_service_error(monkeypatch):
+def mock_canton_data_access_error(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_error()
+        return MockCantonDataAccessResponse().get_incidences_error()
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(CantonDataAccess, 'get_incidences', mock_get_incidences)
 
 @pytest.fixture
-def mock_canton_service_timeout(monkeypatch):
+def mock_canton_data_access_timeout(monkeypatch):
     def mock_get_incidences(canton, dateFrom, dateTo, bfs_nr=None):
-        return MockCantonServiceResponse().get_incidences_timeout()
+        return MockCantonDataAccessResponse().get_incidences_timeout()
 
-    monkeypatch.setattr(CantonService, 'get_incidences', mock_get_incidences)
+    monkeypatch.setattr(CantonDataAccess, 'get_incidences', mock_get_incidences)
 
 @pytest.fixture
-def mock_canton_service_date(monkeypatch):
+def mock_canton_data_access_date(monkeypatch):
     def mock_get_default_date():
-        return MockCantonServiceResponse().get_default_date()
+        return MockCantonDataAccessResponse().get_default_date()
 
-    monkeypatch.setattr(CantonService, 'get_default_date',
+    monkeypatch.setattr(CantonDataAccess, 'get_default_date',
                         mock_get_default_date)
 
 
 @pytest.fixture
-def mock_canton_service_date_one_day_back(monkeypatch):
+def mock_canton_data_access_date_one_day_back(monkeypatch):
     def mock_get_default_date():
-        return MockCantonServiceResponse().get_default_date_one_day_back()
+        return MockCantonDataAccessResponse().get_default_date_one_day_back()
 
-    monkeypatch.setattr(CantonService, 'get_default_date',
+    monkeypatch.setattr(CantonDataAccess, 'get_default_date',
                         mock_get_default_date)
 
 
 @pytest.fixture
-def mock_canton_service_date_two_days_back(monkeypatch):
+def mock_canton_data_access_date_two_days_back(monkeypatch):
     def mock_get_default_date():
-        return MockCantonServiceResponse().get_default_date_two_days_back()
+        return MockCantonDataAccessResponse().get_default_date_two_days_back()
 
-    monkeypatch.setattr(CantonService, 'get_default_date',
+    monkeypatch.setattr(CantonDataAccess, 'get_default_date',
                         mock_get_default_date)
 
 
 
 @pytest.fixture
-def mock_canton_service_date_three_days_back(monkeypatch):
+def mock_canton_data_access_date_three_days_back(monkeypatch):
     def mock_get_default_date():
-        return MockCantonServiceResponse().get_default_date_three_days_back()
+        return MockCantonDataAccessResponse().get_default_date_three_days_back()
 
-    monkeypatch.setattr(CantonService, 'get_default_date',
+    monkeypatch.setattr(CantonDataAccess, 'get_default_date',
                         mock_get_default_date)
 
 @pytest.fixture
-def mock_canton_service_date_four_days_back(monkeypatch):
+def mock_canton_data_access_date_four_days_back(monkeypatch):
     def mock_get_default_date():
-        return MockCantonServiceResponse().get_default_date_four_days_back()
+        return MockCantonDataAccessResponse().get_default_date_four_days_back()
 
-    monkeypatch.setattr(CantonService, 'get_default_date',
+    monkeypatch.setattr(CantonDataAccess, 'get_default_date',
                         mock_get_default_date)
 
 
-def test_single_waypoint_in_kueblis_gr(client, app, mock_canton_service, mock_canton_service_date):
+def test_single_waypoint_in_kueblis_gr(client, app, mock_canton_data_access, mock_canton_data_access_date):
     """
     Test a single waypoint which lies in Küblis GR returns expected municipality and incidence data
     """
@@ -153,7 +154,7 @@ def test_single_waypoint_in_kueblis_gr(client, app, mock_canton_service, mock_ca
     assert 'geo_shapes' in result[0].keys()
 
 
-def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_service, mock_canton_service_date_one_day_back):
+def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_data_access, mock_canton_data_access_date_one_day_back):
     """
     Test a single waypoint which lies in Küblis GR return expected municipality data and one time retries to get incidence data
     """
@@ -175,7 +176,7 @@ def test_single_waypoint_in_kueblis_gr_retry_1_time(client, app, mock_canton_ser
     assert 'incidence' in result[0].keys()
     assert 'incidence_color' in result[0].keys()
 
-def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_service, mock_canton_service_date_two_days_back):
+def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_data_access, mock_canton_data_access_date_two_days_back):
     """
     Test a single waypoint which lies in Küblis GR return expected municipality data and two times retries to get incidence data
     """
@@ -197,7 +198,7 @@ def test_single_waypoint_in_kueblis_gr_retry_2_times(client, app, mock_canton_se
     assert 'incidence' in result[0].keys()
     assert 'incidence_color' in result[0].keys()
 
-def test_single_waypoint_in_kueblis_gr_retry_3_times(client, app, mock_canton_service, mock_canton_service_date_three_days_back):
+def test_single_waypoint_in_kueblis_gr_retry_3_times(client, app, mock_canton_data_access, mock_canton_data_access_date_three_days_back):
     """
     Test a single waypoint which lies in Küblis return expected municipality data and three times retries to get incidence data
     """
@@ -218,7 +219,7 @@ def test_single_waypoint_in_kueblis_gr_retry_3_times(client, app, mock_canton_se
     assert 'incidence' in result[0].keys()
     assert 'incidence_color' in result[0].keys()
 
-def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canton_service, mock_canton_service_date_four_days_back):
+def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canton_data_access, mock_canton_data_access_date_four_days_back):
     """
     Test a single waypoint which lies in Küblis return expected municipality data but stops after three retries and return no incidence data
     """
@@ -241,9 +242,9 @@ def test_single_waypoint_in_kueblis_gr_no_incidence_data(client, app, mock_canto
     assert result[0]['incidence'] is None
     assert 'incidence_color' in result[0].keys() 
 
-def test_still_returning_municipality_data_when_canton_service_has_error(client, app, mock_canton_service_error, mock_canton_service_date):
+def test_still_returning_municipality_data_when_canton_data_access_has_error(client, app, mock_canton_data_access_error, mock_canton_data_access_date):
     """
-    Test return values when canton service had an error (i.e. the incidence_color) and that municipality data still gets returned
+    Test return values when canton data access had an error (i.e. the incidence_color) and that municipality data still gets returned
     """
     # Given
     waypoints = [{"lat": 46.91455411444433,
@@ -264,9 +265,9 @@ def test_still_returning_municipality_data_when_canton_service_has_error(client,
     assert 'incidence_color' in result[0].keys()
     assert result[0]['incidence_color'] == '#000000'
 
-def test_still_returning_municipality_data_when_canton_service_has_timeout(client, app, mock_canton_service_timeout, mock_canton_service_date):
+def test_still_returning_municipality_data_when_canton_data_access_has_timeout(client, app, mock_canton_data_access_timeout, mock_canton_data_access_date):
     """
-    Test return values when a canton service had a timeout (i.e. the timedout_cantons set) and that municipality data still gets returned
+    Test return values when a canton data access had a timeout (i.e. the timedout_cantons set) and that municipality data still gets returned
     """
     # Given
     waypoints = [{"lat": 46.91455411444433,
@@ -289,7 +290,7 @@ def test_still_returning_municipality_data_when_canton_service_has_timeout(clien
     assert 'incidence_color' in result[0].keys()
     assert result[0]['incidence_color'] == '#000000'
 
-def test_waypoints_outside_switzerland(client, app, mock_canton_service, mock_canton_service_date):
+def test_waypoints_outside_switzerland(client, app, mock_canton_data_access, mock_canton_data_access_date):
     """
     Test that waypoints outside Switzerland do not break the waypoint service, but return an empty result
     """

@@ -2,13 +2,13 @@ from configManager import ConfigManager
 from datetime import datetime
 import logging
 import requests
-from service_models.municipality import Municipality
-from service_models.incidence import Incidence
+from dto.municipality import Municipality
+from dto.incidence import Incidence
 
 logger = logging.getLogger(__name__)
 
 
-class CantonService:
+class CantonDataAccess:
 
     canton_api_urls = ConfigManager.get_instance().get_cantonservice_urls()
 
@@ -19,28 +19,28 @@ class CantonService:
     @staticmethod
     def get_municipalities(canton):
         logger.info(
-            f'CantonService.get_municipalities(canton) with canton={canton}')
+            f'CantonDataAccess.get_municipalities(canton) with canton={canton}')
 
-        if not CantonService.__is_canton_available(canton):
+        if not CantonDataAccess.__is_canton_available(canton):
             return [], 404
 
         try:
 
-            municipalities = CantonService.__get_municipalities(canton, None)
+            municipalities = CantonDataAccess.__get_municipalities(canton, None)
 
             logger.debug(
-                f'Got {len(municipalities)} municipalities from CantonService {canton}.')
+                f'Got {len(municipalities)} municipalities from CantonDataAccess {canton}.')
 
             result = [Municipality(**m).as_dict for m in municipalities]
 
             return result, 200
         except requests.exceptions.Timeout as errh:
             logger.warning(
-                'Timeout when calling CantonService.__get_municipalities or processing its response')
+                'Timeout when calling CantonDataAccess.__get_municipalities or processing its response')
             return None, 408
 
         except requests.exceptions.HTTPError as errh:
-            log_msg = f'HTTPError when calling CantonService.__get_municipalities: {errh.response.status_code} - {errh.response.reason}'
+            log_msg = f'HTTPError when calling CantonDataAccess.__get_municipalities: {errh.response.status_code} - {errh.response.reason}'
             if errh.response.status_code < 500:
                 logger.warning(log_msg)
             else:
@@ -48,7 +48,7 @@ class CantonService:
             return None, errh.response.status_code
         except requests.exceptions.RequestException:
             logger.exception(
-                'Exception when calling CantonService.__get_municipalities or processing its response.')
+                'Exception when calling CantonDataAccess.__get_municipalities or processing its response.')
             return None, None
 
     @staticmethod
@@ -123,7 +123,7 @@ class CantonService:
         resource_path = '/incidences/'
         query_params = {'dateFrom': dateFrom, 'dateTo': dateTo}
 
-        response = CantonService.__get_response(
+        response = CantonDataAccess.__get_response(
             canton, resource_path, bfs_nr, query_params)
         return response.json()
 
@@ -131,12 +131,12 @@ class CantonService:
     def __get_municipalities(canton: str, bfs_nr=None):
         resource_path = '/municipalities/'
 
-        response = CantonService.__get_response(canton, resource_path, bfs_nr)
+        response = CantonDataAccess.__get_response(canton, resource_path, bfs_nr)
         return response.json()
 
     @staticmethod
     def __get_response(canton: str, resource_path: str, path_param: str = None, query_params: dict = None):
-        host, ssl_cert_path = CantonService.__get_request_info(canton)
+        host, ssl_cert_path = CantonDataAccess.__get_request_info(canton)
 
         url = f'{host}{resource_path}' + \
             (f'{path_param}/' if path_param is not None else '')
@@ -152,7 +152,7 @@ class CantonService:
         response.raise_for_status()
 
         logger.debug(
-            f'Got response from CantonService {canton}. (url: {url}, from_cache: {response.from_cache if hasattr(response, "from_cache") else "nocache"}, has SSL cert file: {(ssl_cert_path != "")})')
+            f'Got response from CantonDataAccess {canton}. (url: {url}, from_cache: {response.from_cache if hasattr(response, "from_cache") else "nocache"}, has SSL cert file: {(ssl_cert_path != "")})')
 
         return response
 
@@ -162,9 +162,9 @@ class CantonService:
         host: str = ''
         canton_ssl_cert_path: str = ''
 
-        if CantonService.__is_canton_available(canton):
-            host = CantonService.canton_api_urls[canton]['url']
-            canton_ssl_cert_name = CantonService.canton_api_urls[canton]['ssl_ca_cert']
+        if CantonDataAccess.__is_canton_available(canton):
+            host = CantonDataAccess.canton_api_urls[canton]['url']
+            canton_ssl_cert_name = CantonDataAccess.canton_api_urls[canton]['ssl_ca_cert']
             if canton_ssl_cert_name != '':
                 canton_ssl_cert_path = f'certificates/{canton_ssl_cert_name}'
 
@@ -172,7 +172,7 @@ class CantonService:
 
     @staticmethod
     def __is_canton_available(canton: str):
-        if canton in CantonService.canton_api_urls and CantonService.canton_api_urls[canton]['url'] != '':
+        if canton in CantonDataAccess.canton_api_urls and CantonDataAccess.canton_api_urls[canton]['url'] != '':
             return True
         else:
             logger.warning(f'Canton not available: {canton}')

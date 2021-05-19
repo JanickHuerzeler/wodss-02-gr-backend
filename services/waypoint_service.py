@@ -1,8 +1,8 @@
+from data_access.canton_data_access import CantonDataAccess
+from data_access.geo_data_access import GeoDataAccess
 from datetime import timedelta
 from configManager import ConfigManager
 import logging
-from services.geo_service import GeoService
-from services.canton_service import CantonService
 import pandas as pd
 import math
 import matplotlib
@@ -17,6 +17,7 @@ no_incidence_color: str = ConfigManager.get_instance().get_no_incidence_color()
 min_incidence_normalize_value = ConfigManager.get_instance().get_min_incidence_normalize_value()
 max_incidence_normalize_value = ConfigManager.get_instance().get_max_incidence_normalize_value()
 
+
 class WaypointService:
 
     @staticmethod
@@ -25,7 +26,7 @@ class WaypointService:
         municipalities_geo_data = []
         timedout_cantons = set()
 
-        municipalities_geo_data = GeoService.get_geodata(waypoints)
+        municipalities_geo_data = GeoDataAccess.get_geodata(waypoints)
 
         df_municipalities_geo_data = pd.DataFrame.from_dict(
             municipalities_geo_data)
@@ -39,8 +40,8 @@ class WaypointService:
             df_municipalities_incidence_data = pd.DataFrame()
             # For every found municipality, try to fetch corona data
             for municipality in unique_municipalities:
-                incidence_data, status = CantonService.get_incidences(municipality['canton'], CantonService.get_default_date().strftime(
-                    df), CantonService.get_default_date().strftime(df), municipality['bfs_nr'])
+                incidence_data, status = CantonDataAccess.get_incidences(municipality['canton'], CantonDataAccess.get_default_date().strftime(
+                    df), CantonDataAccess.get_default_date().strftime(df), municipality['bfs_nr'])
 
                 retry_count = 0
 
@@ -53,8 +54,8 @@ class WaypointService:
 
                     delta_days = timedelta(days=retry_count)
 
-                    incidence_data, status = CantonService.get_incidences(municipality['canton'], (CantonService.get_default_date() - delta_days).strftime(
-                        df), (CantonService.get_default_date() - delta_days).strftime(df), municipality['bfs_nr'])
+                    incidence_data, status = CantonDataAccess.get_incidences(municipality['canton'], (CantonDataAccess.get_default_date() - delta_days).strftime(
+                        df), (CantonDataAccess.get_default_date() - delta_days).strftime(df), municipality['bfs_nr'])
 
                 if incidence_data:
                     df_incidence_data = pd.DataFrame.from_dict(incidence_data)

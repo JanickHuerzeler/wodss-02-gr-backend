@@ -1,7 +1,7 @@
 import logging
 import pytest
 from configManager import ConfigManager
-from services.canton_service import CantonService
+from services.municipality_service import MunicipalityService
 
 application_root = ConfigManager.get_instance().get_application_root()
 # Enforce trailing slash
@@ -13,7 +13,7 @@ NUMBER_OF_MOCKED_MUNICIPALITIES = 2
 default_language = 'de-DE'
 
 
-class MockCantonServiceResponse:
+class MockMunicipalityServiceResponse:
     @staticmethod
     def get_municipalities(canton):
         # Mocking only (parts of) canton GR
@@ -40,19 +40,19 @@ class MockCantonServiceResponse:
         return None, 404
 
     @staticmethod
-    def get_municipalities_canton_service_error(canton):
+    def get_municipalities_municipality_service_error(canton):
         return None, None
 
     @staticmethod
-    def get_municipality_canton_service_error(canton, bfs_nr):
+    def get_municipality_municipality_service_error(canton, bfs_nr):
         return None, None
 
     @staticmethod
-    def get_municipalities_canton_service_500_error(canton):
+    def get_municipalities_municipality_service_500_error(canton):
         return None, 500
 
     @staticmethod
-    def get_municipality_canton_service_500_error(canton, bfs_nr):
+    def get_municipality_municipality_service_500_error(canton, bfs_nr):
         return None, 500
 
     @staticmethod
@@ -73,75 +73,75 @@ class MockCantonServiceResponse:
 
 
 @pytest.fixture
-def mock_canton_service(monkeypatch):
+def mock_municipality_service(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities(canton)
+        return MockMunicipalityServiceResponse().get_municipalities(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municipality(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municipality(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 @pytest.fixture
-def mock_canton_service_unavailable_canton(monkeypatch):
+def mock_municipality_service_unavailable_canton(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities_unavailable_canton(canton)
+        return MockMunicipalityServiceResponse().get_municipalities_unavailable_canton(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municipality_unavailable_canton(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municipality_unavailable_canton(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 @pytest.fixture
-def mock_canton_service_timedout(monkeypatch):
+def mock_municipality_service_timedout(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities_timedout(canton)
+        return MockMunicipalityServiceResponse().get_municipalities_timedout(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municpality_timedout(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municpality_timedout(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 @pytest.fixture
-def mock_canton_service_error(monkeypatch):
+def mock_municipality_service_error(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities_canton_service_error(canton)
+        return MockMunicipalityServiceResponse().get_municipalities_municipality_service_error(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municipality_canton_service_error(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municipality_municipality_service_error(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 @pytest.fixture
-def mock_canton_service_500_error(monkeypatch):
+def mock_municipality_service_500_error(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities_canton_service_500_error(canton)
+        return MockMunicipalityServiceResponse().get_municipalities_municipality_service_500_error(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municipality_canton_service_500_error(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municipality_municipality_service_500_error(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 @pytest.fixture
-def mock_canton_service_no_data(monkeypatch):
+def mock_municipality_service_no_data(monkeypatch):
     def mock_get_municipalities(canton):
-        return MockCantonServiceResponse().get_municipalities_no_data(canton)
+        return MockMunicipalityServiceResponse().get_municipalities_no_data(canton)
 
     def mock_get_municipality(canton, bfs_nr):
-        return MockCantonServiceResponse().get_municipality_no_data(canton, bfs_nr)
+        return MockMunicipalityServiceResponse().get_municipality_no_data(canton, bfs_nr)
 
-    monkeypatch.setattr(CantonService, 'get_municipalities', mock_get_municipalities)
-    monkeypatch.setattr(CantonService, 'get_municipality', mock_get_municipality)
+    monkeypatch.setattr(MunicipalityService, 'get_municipalities', mock_get_municipalities)
+    monkeypatch.setattr(MunicipalityService, 'get_municipality', mock_get_municipality)
 
 
 
@@ -150,7 +150,7 @@ GET /cantons/<canton>/municipalities/
 """
 
 
-def test_municipalities_base_route(client, app, mock_canton_service):
+def test_municipalities_base_route(client, app, mock_municipality_service):
     """
     Check if /cantons/{canton}/municipalities/ route returns
     - correct content-type "application/json"
@@ -169,7 +169,7 @@ def test_municipalities_base_route(client, app, mock_canton_service):
     assert len(data) == NUMBER_OF_MOCKED_MUNICIPALITIES
 
 
-def test_municipalities_unavailable_canton(client, app, mock_canton_service_unavailable_canton):
+def test_municipalities_unavailable_canton(client, app, mock_municipality_service_unavailable_canton):
     """
     Check if a provided canton, that has no corresponding canton service implemented, returns
     - status code 404
@@ -189,7 +189,7 @@ def test_municipalities_unavailable_canton(client, app, mock_canton_service_unav
     assert bytes(f'No canton found for "{unavailable_canton}".', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_invalid_canton_format(client, app, mock_canton_service):
+def test_municipalities_invalid_canton_format(client, app, mock_municipality_service):
     """
     Check if invalid canton format returns
     - status code 400
@@ -208,7 +208,7 @@ def test_municipalities_invalid_canton_format(client, app, mock_canton_service):
     assert bytes(f'Invalid format for parameter "canton" (required: 2 chars)', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_canton_service_timedout(client, app, mock_canton_service_timedout):
+def test_municipalities_municipality_service_timedout(client, app, mock_municipality_service_timedout):
     """
     Check if a timeout in canton service returns
     - status code 408
@@ -226,7 +226,7 @@ def test_municipalities_canton_service_timedout(client, app, mock_canton_service
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_canton_service_error(client, app, mock_canton_service_error):
+def test_municipalities_municipality_service_error(client, app, mock_municipality_service_error):
     """
     Check if error in canton service returns
     - status code  502
@@ -244,7 +244,7 @@ def test_municipalities_canton_service_error(client, app, mock_canton_service_er
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_canton_service_500_error(client, app, mock_canton_service_500_error):
+def test_municipalities_municipality_service_500_error(client, app, mock_municipality_service_500_error):
     """
     Check if error in canton service returns
     - status code  502
@@ -262,7 +262,7 @@ def test_municipalities_canton_service_500_error(client, app, mock_canton_servic
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" (status 500).', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_canton_no_data(client, app, mock_canton_service_no_data):
+def test_municipalities_canton_no_data(client, app, mock_municipality_service_no_data):
     """
     Check if empty result set returns
     - status code 404
@@ -280,7 +280,7 @@ def test_municipalities_canton_no_data(client, app, mock_canton_service_no_data)
     assert bytes(f'No municipalities found for canton "{MOCK_CANTON}".', encoding='utf8') in response.get_data()
 
 
-def test_municipalities_wrong_language_still_works(client, app, mock_canton_service, caplog):
+def test_municipalities_wrong_language_still_works(client, app, mock_municipality_service, caplog):
     """
     Check if request with unsupported language returns
     - still status code 200
@@ -307,7 +307,7 @@ GET /cantons/<canton>/municipalities/<bfsNr>/
 """
 
 
-def test_municipality_base_route_with_bfs_nr(client, app, mock_canton_service):
+def test_municipality_base_route_with_bfs_nr(client, app, mock_municipality_service):
     """
     Check if /cantons/{canton}/municipalities/{bfsNr} route returns
     - correct content-type "application/json"
@@ -328,7 +328,7 @@ def test_municipality_base_route_with_bfs_nr(client, app, mock_canton_service):
     assert data['bfsNr'] == bfs_nr
 
 
-def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_canton_service_unavailable_canton):
+def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_municipality_service_unavailable_canton):
     """
     Check if a provided canton, that has no corresponding canton service implemented, returns
     - status code 404
@@ -348,7 +348,7 @@ def test_municipality_unavailable_canton_with_bfs_nr(client, app, mock_canton_se
     assert bytes(f'No canton found for "{unavailable_canton}".', encoding='utf8') in response.get_data()
 
 
-def test_municipality_invalid_canton_format(client, app, mock_canton_service):
+def test_municipality_invalid_canton_format(client, app, mock_municipality_service):
     """
     Check if invalid canton format returns
     - status code 400
@@ -368,7 +368,7 @@ def test_municipality_invalid_canton_format(client, app, mock_canton_service):
     assert bytes(f'Invalid format for parameter "canton" (required: 2 chars)', encoding='utf8') in response.get_data()
 
 
-def test_municipality_canton_service_timedout(client, app, mock_canton_service_timedout):
+def test_municipality_municipality_service_timedout(client, app, mock_municipality_service_timedout):
     """
     Check if a timeout in canton service returns
     - status code 408
@@ -387,7 +387,7 @@ def test_municipality_canton_service_timedout(client, app, mock_canton_service_t
     assert bytes(f'Canton service {MOCK_CANTON} timed out', encoding='utf8') in response.get_data()
 
 
-def test_municipality_canton_service_error(client, app, mock_canton_service_error):
+def test_municipality_municipality_service_error(client, app, mock_municipality_service_error):
     """
     Check if error in canton service returns
     - status code  502
@@ -406,7 +406,7 @@ def test_municipality_canton_service_error(client, app, mock_canton_service_erro
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" for bfsNr "{bfs_nr}".', encoding='utf8') in response.get_data()
 
 
-def test_municipality_canton_service_500_error(client, app, mock_canton_service_500_error):
+def test_municipality_municipality_service_500_error(client, app, mock_municipality_service_500_error):
     """
     Check if error in canton service returns
     - status code  502
@@ -425,7 +425,7 @@ def test_municipality_canton_service_500_error(client, app, mock_canton_service_
     assert bytes(f'Could not get data from canton service "{MOCK_CANTON}" for bfsNr "{bfs_nr}" (status 500).', encoding='utf8') in response.get_data()
 
 
-def test_municipality_canton_service_no_data(client, app, mock_canton_service_no_data):
+def test_municipality_municipality_service_no_data(client, app, mock_municipality_service_no_data):
     """
     Check if empty result set (e.g. municipality not found in canton) returns
     - status code 404
@@ -444,7 +444,7 @@ def test_municipality_canton_service_no_data(client, app, mock_canton_service_no
     assert bytes(f'No municipality found for canton "{MOCK_CANTON}" and bfsNr "{bfs_nr}".', encoding='utf8') in response.get_data()
 
 
-def test_municipality_wrong_bfs_nr_format(client, app, mock_canton_service):
+def test_municipality_wrong_bfs_nr_format(client, app, mock_municipality_service):
     """
     Check if wrong bfsNr format returns
     - status code 400
@@ -463,7 +463,7 @@ def test_municipality_wrong_bfs_nr_format(client, app, mock_canton_service):
     assert bytes('Invalid format for parameter "bfsNr" (required: 4-digit number)', encoding='utf8') in response.get_data()
 
 
-def test_municipality_wrong_language_still_works(client, app, mock_canton_service, caplog):
+def test_municipality_wrong_language_still_works(client, app, mock_municipality_service, caplog):
     """
     Check if request with unsupported language returns
     - still status code 200

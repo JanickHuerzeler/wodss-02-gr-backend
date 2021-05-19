@@ -12,7 +12,7 @@ for pos, geo_feature in enumerate(geo_features):
         polygonIndex.insert(pos, shape(geo_feature['geometry']).bounds)
 
 
-class GeoService:
+class GeoDataAccess:
 
 
     @staticmethod
@@ -39,10 +39,10 @@ class GeoService:
 
                     geo_shape_type = entry['geometry']['type']
                     if geo_shape_type == 'Polygon':
-                        municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape,
+                        municipality['geo_shapes'] = [list(map(GeoDataAccess.__format_geoshape,
                                                                entry['geometry']['coordinates'][0]))]
                     elif geo_shape_type == 'MultiPolygon':
-                        municipality['geo_shapes'] = [list(map(GeoService.__format_geoshape, polygon[0]))
+                        municipality['geo_shapes'] = [list(map(GeoDataAccess.__format_geoshape, polygon[0]))
                                                       for polygon in entry['geometry']['coordinates']]
                     else:
                         logger.warning(f'Unknown geo_shape type {geo_shape_type}!')

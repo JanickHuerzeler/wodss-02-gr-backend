@@ -1,8 +1,8 @@
+from services.municipality_service import MunicipalityService
 from flask import jsonify, request, Blueprint
 from configManager import ConfigManager
 from app import app
 import logging
-from services.canton_service import CantonService
 from services.errorhandler_service import ErrorHandlerService
 from flask_cors import cross_origin
 
@@ -66,7 +66,7 @@ def get_municipalities_for_canton(canton):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_municipalities(canton.upper())
+    result, status = MunicipalityService.get_municipalities(canton.upper())
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
@@ -144,7 +144,7 @@ def get_municipalitiy_for_canton(canton, bfsNr):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_municipality(canton.upper(), bfsNr)
+    result, status = MunicipalityService.get_municipality(canton.upper(), bfsNr)
 
     if status == 408:
         return f'Canton service {canton} timed out', 408

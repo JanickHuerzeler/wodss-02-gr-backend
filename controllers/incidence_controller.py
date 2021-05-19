@@ -1,9 +1,9 @@
+from services.incidence_service import IncidenceService
 from flask import jsonify, request, Blueprint
 from datetime import datetime
 from configManager import ConfigManager
 from app import app
 import logging
-from services.canton_service import CantonService
 from services.errorhandler_service import ErrorHandlerService
 from flask_cors import cross_origin
 
@@ -89,7 +89,7 @@ def get_incidences_for_canton(canton):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_incidences(canton.upper(), date_from, date_to)
+    result, status = IncidenceService.get_incidences(canton.upper(), date_from, date_to)
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
@@ -189,7 +189,7 @@ def get_incidences_for_canton_and_bfs_nr(canton, bfsNr):
         logger.debug(f'Invalid language ({language}), using default language instead ({default_language}).')
         language = default_language
 
-    result, status = CantonService.get_incidences(canton.upper(), date_from, date_to, bfsNr)
+    result, status = IncidenceService.get_incidences(canton.upper(), date_from, date_to, bfsNr)
 
     if status == 408:
         return f'Canton service {canton} timed out', 408
