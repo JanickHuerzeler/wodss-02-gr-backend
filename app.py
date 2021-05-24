@@ -16,7 +16,7 @@ swagger = Swagger(app, template=template, config={"specs_route": "/"}, merge=Tru
 
 # Setup logging
 log_file_path = path.join(path.dirname(path.abspath(__file__)), 'log.conf')
-logging.config.fileConfig(log_file_path)
+logging.config.fileConfig(log_file_path, disable_existing_loggers=True)
 
 logger = logging.getLogger(__name__)
 
